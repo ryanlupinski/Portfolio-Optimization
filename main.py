@@ -2,7 +2,6 @@ __author__ = 'ryanlupinski'
 
 import datetime as dt
 import os
-from typing import List
 import pandas as pd
 import pandas_datareader.data as web
 from pandas.tseries.offsets import BDay
