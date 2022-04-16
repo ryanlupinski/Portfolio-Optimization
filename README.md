@@ -1,2 +1,2 @@
 # Portfolio-Optimization
- A quantative approach to optimal asset allocation
+ A quantitative approach to optimal asset allocation
