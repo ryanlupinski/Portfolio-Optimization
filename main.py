@@ -48,7 +48,7 @@ ETF_price_data_200D_SMA = ETF_price_data_one_year_close.rolling(window=200).mean
 ETF_price_data_200D_SMA_latest = ETF_price_data_200D_SMA.tail(1)
 
 # Create CSV in Price Data folder for closing price and 200 day simple moving average
-path = r'/Users/ryanlupinski/PycharmProjects/Finance/Trinity Strategy/Price Data'
+path = r'/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Price Data'
 ETF_price_data_one_year.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
 ETF_price_data_200D_SMA_latest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
 
@@ -81,5 +81,5 @@ Portfolio_returns = pd.concat(Returns_concatenated)
 Portfolio_returns = Portfolio_returns.assign(Returns=['1 month', '3 month', '6 month', '1 year'])
 
 # Create CSV in Performance Data folder
-path = r'/Users/ryanlupinski/PycharmProjects/Finance/Trinity Strategy/Performance Data'
+path = r'/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Performance Data'
 Portfolio_returns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
