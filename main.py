@@ -9,14 +9,14 @@ from dateutil.relativedelta import *
 
 # Define ETFs in Portfolio
 portfolio = [
-    'MTUM',  # US Stocks Momentum
+    'MTUM', # US Stocks Momentum
     'VTV',  # US Stocks Value
     'VEU',  # Foreign Developed Stock
     'VWO',  # Foreign Emerging Stocks
-    'VCIT',  # Corporate Bonds
-    'VGLT',  # 30Y Bonds
-    'BNDX',  # 10Y Foreign Bonds
-    'VTIP',  # TIPS
+    'VCIT', # Corporate Bonds
+    'VGLT', # 30Y Bonds
+    'BNDX', # 10Y Foreign BondsPo
+    'VTIP', # TIPS
     'VAW',  # Commodities
     'IAU',  # Gold
     'VNQ',  # REITS
@@ -29,11 +29,7 @@ three_month = dt.date(today.year, today.month, 1) - relativedelta(months=2, days
 six_month = dt.date(today.year, today.month, 1) - relativedelta(months=5, days=0) - BDay()
 one_year = dt.date(today.year, today.month, 1) - relativedelta(months=11, days=0) - BDay()
 
-print(today)
-print(one_month)
-print(three_month)
-print(six_month)
-print(one_year)
+print(today, one_month, three_month, six_month, one_year, sep="\n")
 
 # Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs
 ETF_price_data_one_month = web.DataReader(portfolio, 'yahoo', one_month, today)['Adj Close']
@@ -46,11 +42,6 @@ ETF_price_data_latest = ETF_price_data_one_year.tail(1)
 ETF_price_data_one_year_close = web.DataReader(portfolio, 'yahoo', one_year, today)['Close']
 ETF_price_data_200D_SMA = ETF_price_data_one_year_close.rolling(window=200).mean()
 ETF_price_data_200D_SMA_latest = ETF_price_data_200D_SMA.tail(1)
-
-# Create CSV in Price Data folder for closing price and 200 day simple moving average
-path = r'/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Price Data'
-ETF_price_data_one_year.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
-ETF_price_data_200D_SMA_latest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
 
 # Calculate 1m, 3m, 6m, & 1y returns for all ETFs in portfolio
 # 1 month
@@ -80,6 +71,8 @@ Returns_concatenated = [
 Portfolio_returns = pd.concat(Returns_concatenated)
 Portfolio_returns = Portfolio_returns.assign(Returns=['1 month', '3 month', '6 month', '1 year'])
 
-# Create CSV in Performance Data folder
-path = r'/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Performance Data'
+# Create CSV for closing price data, 200 day simple moving average data, and returns data
+path = os.getcwd() + "/CSVs"
+ETF_price_data_one_year.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
+ETF_price_data_200D_SMA_latest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
 Portfolio_returns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
