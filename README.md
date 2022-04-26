@@ -6,12 +6,13 @@
 - I am learning to use Github and Github Pages to build a portfolio of my projects and document how I am learning python and improving the tool.
 ## Summary
  - This python script was developed to automate the investing strategy of Meb Faber's 'Trinity Portfolio' as described here: [Cambria Investments](https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf) (external link)
- - The goal of the Trinity Portfolio is long-term growth, reduced volatility, and to minimize drawdowns 
- - These goals are achieved by building a portfolio that 1) includes all major global asset classes with a tilt towards value, 2) adds a momentum component and 3) employs trend-following
- - The Portfolio Optimization tool uses python and pandas to scrape ETF price data, calculate each ETFs' 200 day moving average and its 1, 3, 6, and 12 month performance
- - This data is concatenated into 3 CSV files, which can be imported to an Excel spreadsheet which will show the user how the portfolio should weight the percent allocation of each asset class for the following month.
- - The tool is run after the close of trading on the last trading day of each month, the new CSVs are added to the spreadsheet, and the allocation for the following month is generated.
- - The portfolio is rebalanced every month.
+ - Faber's Trinity Portfolio has 3  core elements: 1) assets diversified across a global investment set, 2) tilts toward investments exhibiting value and momentum traits, and 3) exposure to trend following.
+ - 11 ETFs make up the portfolio (See Listing 1).
+ - The first 50% of the portfolio allocates a fixed weighting to each asset class based on Global Market Portfolio theory
+ - The second 50% uses momentum and trend-following calculations to allocate an additional 10% to the top 5 performing asset classes.
+ - Pandas is used to calculate the total return (momentum) and 200 day moving average (trend-following) of each ETF.
+ - The script is run once a month after the close of the last trading day and produces 3 .csv files that are imported into a spreadsheet.
+ - Formulas in the spreadsheet create the logic that determines the total allocation of all asset classes for the portfolio for the following month.
 ## Globally-Diversified Investments
 The portfolio comprises 11 ETFs which represent all major asset classes.
 ```python
@@ -29,7 +30,8 @@ portfolio = [
     'IAU',  # Gold
     'VNQ',  # REITS
 ]
-```
+``` 
+Listing 1
 ## Timeframes
 The tool follows Faber's strategy by creating timeframes for calculating returns of each ETFs. These variables store start and end dates that are used as parameters for calculating returns and  200 day moving averages.
 Investment returns are calculated by finding the change in price from the last business day of each month, ie the total 1 month return from 4/29/22 (the last trading day in April 2022) is calculated from 3/31/22 (the last trading day in March).
