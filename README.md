@@ -18,7 +18,7 @@
 # Version 1.0.: Portfolio Optimization Tool
 ## 1st 50%: 'Buy and hold' fixed weighting
 The portfolio comprises 11 ETFs which represent all major asset classes. The strategy tries to get the 'best of both worlds' by making 50% of the portfolio 'buy and hold'
-and the other 50% be dynamically allocated based on momentum and trend-following. Below is the fixed weighting based on GMP theory.
+and the other 50% be dynamically allocated based on momentum and trend-following. Below is the fixed weighting based on GMP theory. We will divide each percentage listed below by 2 and use that as our 'buy and hold' portion.
 ![Fixed weight](docs/GMP-fixed-weight.png?raw=true)
 
 Figure 1. Fixed weight allocation portion of portfolio
