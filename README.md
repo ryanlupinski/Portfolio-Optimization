@@ -1,11 +1,10 @@
 # Portfolio-Optimization Tool: A quantitative approach to optimal asset allocation
 
----
 ## Preface
 - I wanted to learn python, so I decided to build a tool that would help me invest my money in a quantitative, un-biased, and methodical strategy.
 - I built this tool without any formal python training. <mark>It is very 'un-pythonic' in its current state. Bare with me as I make updates and improve the tool<mark>.
 - I am learning to use Github and Github Pages to build a portfolio of my projects and document how I am learning python and improving the tool.
----
+
 ## Summary
  - This python script was developed to automate the investing strategy of Meb Faber's 'Trinity Portfolio' as described here: [Cambria Investments](https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf) (external link)
  - Faber's Trinity Portfolio has 3  core elements: 1) assets diversified across a global investment set, 2) tilts toward investments exhibiting value and momentum traits, and 3) exposure to trend following.
@@ -16,11 +15,12 @@
  - The script is run once a month after the close of the last trading day and produces 3 .csv files that are imported into a spreadsheet.
  - Formulas in the spreadsheet create the logic that determines the total allocation of all asset classes for the portfolio for the following month.
 ---
-# Version 1.0.0: Portfolio Optimization Tool
+# Version 1.0.: Portfolio Optimization Tool
 ## 1st 50%: 'Buy and hold' fixed weighting
 The portfolio comprises 11 ETFs which represent all major asset classes. The strategy tries to get the 'best of both worlds' by making 50% of the portfolio 'buy and hold'
 and the other 50% be dynamically allocated based on momentum and trend-following. Below is the fixed weighting based on GMP theory.
 ![Fixed weight](docs/GMP-fixed-weight.png?raw=true)
+
 Figure 1. Fixed weight allocation portion of portfolio
 
 ```python
