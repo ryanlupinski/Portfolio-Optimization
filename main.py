@@ -1,5 +1,10 @@
 __author__ = 'ryanlupinski'
 
+"""
+Change log:
+RAL 4/30: add change log, replace VAW with DBC in portfolio, update timeframe calculation, update readme
+"""
+
 import datetime as dt
 import os
 import pandas as pd
@@ -17,29 +22,30 @@ portfolio = [
     'VGLT', # 30Y Bonds
     'BNDX', # 10Y Foreign BondsPo
     'VTIP', # TIPS
-    'VAW',  # Commodities
+    'DBC',  # Commodities
     'IAU',  # Gold
     'VNQ',  # REITS
 ]
 
 # Define time frames
 today = dt.date.today()
-one_month = dt.date(today.year, today.month, 1) - relativedelta(months=0, days=0) - BDay()
-three_month = dt.date(today.year, today.month, 1) - relativedelta(months=2, days=0) - BDay()
-six_month = dt.date(today.year, today.month, 1) - relativedelta(months=5, days=0) - BDay()
-one_year = dt.date(today.year, today.month, 1) - relativedelta(months=11, days=0) - BDay()
+lastTradingDayOfMonth = dt.date(today.year, today.month, 1) + relativedelta(months=1, days=0) - BDay()
+one_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=0, days=0) - BDay()
+three_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=2, days=0) - BDay()
+six_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=5, days=0) - BDay()
+one_year = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=11, days=0) - BDay()
 
-print(today, one_month, three_month, six_month, one_year, sep="\n")
+print(lastTradingDayOfMonth, one_month, three_month, six_month, one_year, sep="\n")
 
 # Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs
-ETF_price_data_one_month = web.DataReader(portfolio, 'yahoo', one_month, today)['Adj Close']
-ETF_price_data_three_month = web.DataReader(portfolio, 'yahoo', three_month, today)['Adj Close']
-ETF_price_data_six_month = web.DataReader(portfolio, 'yahoo', six_month, today)['Adj Close']
-ETF_price_data_one_year = web.DataReader(portfolio, 'yahoo', one_year, today)['Adj Close']
+ETF_price_data_one_month = web.DataReader(portfolio, 'yahoo', one_month, lastTradingDayOfMonth)['Adj Close']
+ETF_price_data_three_month = web.DataReader(portfolio, 'yahoo', three_month, lastTradingDayOfMonth)['Adj Close']
+ETF_price_data_six_month = web.DataReader(portfolio, 'yahoo', six_month, lastTradingDayOfMonth)['Adj Close']
+ETF_price_data_one_year = web.DataReader(portfolio, 'yahoo', one_year, lastTradingDayOfMonth)['Adj Close']
 ETF_price_data_latest = ETF_price_data_one_year.tail(1)
 
 # Create data frames of 200 day simple moving average
-ETF_price_data_one_year_close = web.DataReader(portfolio, 'yahoo', one_year, today)['Close']
+ETF_price_data_one_year_close = web.DataReader(portfolio, 'yahoo', one_year, lastTradingDayOfMonth)['Close']
 ETF_price_data_200D_SMA = ETF_price_data_one_year_close.rolling(window=200).mean()
 ETF_price_data_200D_SMA_latest = ETF_price_data_200D_SMA.tail(1)
 

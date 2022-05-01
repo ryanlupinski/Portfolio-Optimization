@@ -34,7 +34,7 @@ portfolio = [
     'VGLT', # 30Y Bonds
     'BNDX', # 10Y Foreign Bonds
     'VTIP', # TIPS
-    'VAW',  # Commodities
+    'DBC',  # Commodities
     'IAU',  # Gold
     'VNQ',  # REITS
 ]
@@ -59,7 +59,7 @@ ie. if only 4 etfs rank in the top 5 and are above 200DSMA, allocate 10% cash
     if only 2 etfs rank in the top 5 and are above 200DSMA, allocate 30% cash
     if 0 etfs rank in the top 5 and are above 200DSMA, allocate 50% cash
 ```
-Listing 2. Pseudo-code for momentum and trend-following with logic checks
+Listing 2. Pseudocode for momentum and trend-following with logic checks
 
 Now that the method for allocating the 2nd 50% (5 x 10% for the top 5 etfs, or a remainder in cash)
 lets look at how the tool performs these steps.
@@ -71,13 +71,14 @@ Each timeframe works by finding the first day of the current month. Then it will
 ```python
 # Define time frames
 today = dt.date.today()
-one_month = dt.date(today.year, today.month, 1) - relativedelta(months=0, days=0) - BDay()
-three_month = dt.date(today.year, today.month, 1) - relativedelta(months=2, days=0) - BDay()
-six_month = dt.date(today.year, today.month, 1) - relativedelta(months=5, days=0) - BDay()
-one_year = dt.date(today.year, today.month, 1) - relativedelta(months=11, days=0) - BDay()
-print(today, one_month, three_month, six_month, one_year, sep="\n")
+lastTradingDayOfMonth = dt.date(today.year, today.month, 1) + relativedelta(months=1, days=0) - BDay()
+one_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=0, days=0) - BDay()
+three_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=2, days=0) - BDay()
+six_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=5, days=0) - BDay()
+one_year = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=11, days=0) - BDay()
+print(lastTradingDayOfMonth, one_month, three_month, six_month, one_year, sep="\n")
 
->> 2022-04-29 # Today will return the day the script is run. This should be run after the close of the last trading day
+>> 2022-04-29 00:00:00 # lastTradingDayOfMonth will return the last trading day of the month
 >> 2022-03-31 00:00:00 # '1 month' in finance days from 4/29/22 is 3/31/22, ie the last business day of the prior month
 >> 2022-01-31 00:00:00 # '3 months' from 4/29/22 is 1/31/22
 >> 2021-10-29 00:00:00 # '6 months' from 4/29/22 is 10/29/22 (10/30/22 and 10/31/22 was Sat and Sun)
@@ -159,12 +160,12 @@ ETF_price_data_200D_SMA_latest.to_csv(os.path.join(path, r'Portfolio Latest 200D
 Portfolio_returns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
 ```
 ### Final Output
-The tool was ran on 3-31-22 and the formulas in the spreadsheet implement the logic
-described in the pseudo-code above. This would give the user the percent allocation his or her
-portfolio should have for teh following month, 4/22.
+The tool was run on 4-30-22 and the formulas in the spreadsheet implement the logic
+described in the pseudocode above. This would give the user the percent allocation his or her
+portfolio should have for teh following month, 5/22.
 
-![portfolio 3-31-22](docs/portfolio-3-31-22.png?raw=true)
-Figure 2. Output in excel showing allocation for the month of 4/22
+![portfolio 4-29-22](docs/portfolio-4-30-22.png?raw=true)
+Figure 2. Output in Excel showing allocation for the month of 5/22
 
 ### References
  - Meb Faber (2016). [The Trinity Portfolio](https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf)
