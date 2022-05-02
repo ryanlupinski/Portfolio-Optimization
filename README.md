@@ -3,11 +3,11 @@
 ## Preface
 - I wanted to learn python, so I decided to build a tool that would help me invest my money in a quantitative, un-biased, and methodical strategy.
 - I built this tool without any formal python training. <mark>It is very 'un-pythonic' in its current state. Bare with me as I make updates and improve the tool<mark>.
-- I am learning to use Github and Github Pages to build a portfolio of my projects and document how I am learning python and improving the tool.
+- I am learning to use GitHub and GitHub Pages to build a portfolio of my projects and document how I am learning python and improving the tool.
 
 ## Summary
  - This python script was developed to automate the investing strategy of Meb Faber's 'Trinity Portfolio' as described here: [Cambria Investments](https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf) (external link)
- - Faber's Trinity Portfolio has 3  core elements: 1) assets diversified across a global investment set, 2) tilts toward investments exhibiting value and momentum traits, and 3) exposure to trend following.
+ - Faber's Trinity Portfolio has 3  core elements: 1) assets diversified across a global investment set 2) tilts toward value and momentum and 3) exposure to trend following.
  - 11 ETFs make up the portfolio (See Listing 1).
  - The first 50% of the portfolio allocates a fixed weighting to each asset class based on Global Market Portfolio (GMP) theory
  - The second 50% uses momentum and trend-following calculations to allocate an additional 10% to the top 5 performing asset classes.
@@ -42,8 +42,8 @@ portfolio = [
 Listing 1. List of ETF symbol names
 
 ## 2nd 50%: Momentum and Trend-Following
-The tool uses Pandas to calculate total return and 200 day simple moving averages (200DSMA) of all asset classes.
-Below is rough pseudo-code that describes the method for determining the momentum and trend-following allocation.
+The tool uses Pandas to calculate total return and 200 day simple moving averages (200-Day SMA) of all asset classes.
+Below is rough pseudocode that describes the method for determining the momentum and trend-following allocation.
 ```
 for etf in portfolio:
     calculate etf 1,3,6,12 month total return
@@ -65,8 +65,8 @@ Now that the method for allocating the 2nd 50% (5 x 10% for the top 5 etfs, or a
 lets look at how the tool performs these steps.
 
 ### Timeframes for total returns
-The tool follows Faber's strategy by creating timeframes for calculating returns of each ETFs. These variables store start and end dates that are used as parameters for calculating returns and  200 day moving averages.
-Investment returns are calculated by finding the change in price from the last business day of each month, ie the total 1 month return from 4/29/22 (the last trading day in April 2022) is calculated from 3/31/22 (the last trading day in March).
+The tool follows Faber's strategy by creating timeframes for calculating returns of each ETF. These variables store start and end dates that are used as parameters for calculating returns and  200 day moving averages.
+Investment returns are calculated by finding the change in price from the last business day of each month, ie the total 1-month return from 4/29/22 (the last trading day in April 2022) is calculated from 3/31/22 (the last trading day in March).
 Each timeframe works by finding the first day of the current month. Then it will subtract the number of months for each time frame, then subtract a final business day BDay() to return the last trading day of the timeframe.
 ```python
 # Define time frames
@@ -85,11 +85,11 @@ print(lastTradingDayOfMonth, one_month, three_month, six_month, one_year, sep="\
 >> 2021-04-30 00:00:00 # '1 year' from 4/29/22 is 4/30/21
 ```
 
-Now we have the start and end dates for scraping price data and determining ETF returns and calculating the 200 day moving average.
+Now we have the start and end dates for scraping price data and determining ETF returns and calculating the 200-day moving average.
 
 ### Using Pandas 
 The tool's initial version uses pandas to create dataframes for all the ETFs price data and stores them in memory and timeframes of 1m, 3m, 6m, and 12m from the datetime module.
-This is not the best way to do this (ie. without using functions and objects) but later versions will correct this and handle more 
+This is not the best way to do this (i.e. without using functions and objects) but later versions will correct this and handle more 
 of the methodology entirely in python as etf objects, vs dataframes like in R programming.
 
 The `pandas` library and `pandas_datareader.data` as `web` give the tool functionality to retrieve stock/etf price data and save dataframes
@@ -137,10 +137,10 @@ Portfolio_returns = pd.concat(Returns_concatenated)
 Portfolio_returns = Portfolio_returns.assign(Returns=['1 month', '3 month', '6 month', '1 year'])
 ```
 
-### 200DSMA
-The 1 year time frame must be used (for obvious reasons) to calculate the 200DSMA. The `.rolling`
+### 200-Day Simple Moving Average
+The 1-year time frame must be used (for obvious reasons) to calculate the 200-Day SMA. The `.rolling`
 function gives us our window parameter and the `.mean()` function averages over the
-window. Again, `.tail()` returns only the last day's 200DSMA so we can compare against the closing price on the last trading
+window. Again, `.tail()` returns only the last day's 200-Day SMA, so we can compare against the closing price on the last trading
 day of the month. 
 ```python
 # Create data frames of 200 day simple moving average
@@ -162,7 +162,7 @@ Portfolio_returns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
 ### Final Output
 The tool was run on 4-30-22 and the formulas in the spreadsheet implement the logic
 described in the pseudocode above. This would give the user the percent allocation his or her
-portfolio should have for teh following month, 5/22.
+portfolio should have for the following month, 5/22.
 
 ![portfolio 4-29-22](docs/portfolio-4-30-22.png?raw=true)
 Figure 2. Output in Excel showing allocation for the month of 5/22
@@ -173,7 +173,7 @@ Figure 2. Output in Excel showing allocation for the month of 5/22
 ### To Do
 - convert .ods spreadsheet to .xlsx
 - add some error handling for the /CSVs folder to just create one if not found
-- automatically export CSVs to .xlsx (.ods is not support in `.to_csv`)
-- I would like this to be a jupyter notebook or a living github page. I want main.py to run on the backend once per month and just auto update weightings in the portfolio
+- automatically export CSVs to .xlsx (.ods does not support in `.to_csv`)
+- I would like this to be a jupyter notebook or a living GitHub page. I want main.py to run on the backend once per month and just auto update weightings in the portfolio
 - I also want to build a backtester since this can only run in the current month
 
