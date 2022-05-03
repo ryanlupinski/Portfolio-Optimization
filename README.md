@@ -164,7 +164,7 @@ The tool was run on 4-30-22 and the formulas in the spreadsheet implement the lo
 described in the pseudocode above. This would give the user the percent allocation his or her
 portfolio should have for the following month, 5/22.
 
-![portfolio 4-29-22](docs/portfolio-4-30-22.png?raw=true)
+![portfolio 4-30-22](docs/portfolio-4-30-22.png?raw=true)
 Figure 2. Output in Excel showing allocation for the month of 5/22
 
 ### References
