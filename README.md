@@ -171,9 +171,7 @@ Figure 2. Output in Excel showing allocation for the month of 5/22
  - Meb Faber (2016). [The Trinity Portfolio](https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf)
 
 ### To Do
-- convert .ods spreadsheet to .xlsx
 - add some error handling for the /CSVs folder to just create one if not found
-- automatically export CSVs to .xlsx (.ods does not support in `.to_csv`)
 - I would like this to be a jupyter notebook or a living GitHub page. I want main.py to run on the backend once per month and just auto update weightings in the portfolio
 - I also want to build a backtester since this can only run in the current month
 

@@ -1,10 +1,5 @@
 __author__ = 'ryanlupinski'
 
-"""
-Change log:
-RAL 4/30: add change log, replace VAW with DBC in portfolio, update timeframe calculation, update readme
-"""
-
 import datetime as dt
 import os
 import pandas as pd
@@ -14,14 +9,14 @@ from dateutil.relativedelta import *
 
 # Define ETFs in Portfolio
 portfolio = [
-    'MTUM', # US Stocks Momentum
+    'MTUM',  # US Stocks Momentum
     'VTV',  # US Stocks Value
     'VEU',  # Foreign Developed Stock
     'VWO',  # Foreign Emerging Stocks
-    'VCIT', # Corporate Bonds
-    'VGLT', # 30Y Bonds
-    'BNDX', # 10Y Foreign BondsPo
-    'VTIP', # TIPS
+    'VCIT',  # Corporate Bonds
+    'VGLT',  # 30Y Bonds
+    'BNDX',  # 10Y Foreign BondsPo
+    'VTIP',  # TIPS
     'DBC',  # Commodities
     'IAU',  # Gold
     'VNQ',  # REITS
@@ -29,7 +24,7 @@ portfolio = [
 
 # Define time frames
 today = dt.date.today()
-lastTradingDayOfMonth = dt.date(today.year, today.month, 1) + relativedelta(months=1, days=0) - BDay()
+lastTradingDayOfMonth = dt.date(today.year, today.month, 1) - relativedelta(months=0, days=0) - BDay(1)
 one_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=0, days=0) - BDay()
 three_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=2, days=0) - BDay()
 six_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=5, days=0) - BDay()
@@ -77,7 +72,7 @@ Returns_concatenated = [
 Portfolio_returns = pd.concat(Returns_concatenated)
 Portfolio_returns = Portfolio_returns.assign(Returns=['1 month', '3 month', '6 month', '1 year'])
 
-# Create CSV for closing price data, 200 day simple moving average data, and returns data
+# Create csvs for closing price data, 200 day simple moving average data, and returns data
 path = os.getcwd() + "/CSVs"
 ETF_price_data_one_year.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
 ETF_price_data_200D_SMA_latest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
