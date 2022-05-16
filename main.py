@@ -1,5 +1,11 @@
-__author__ = 'ryanlupinski'
+# ---------------------------------------------------------------------------- #
+# Title: Portfolio Optimization Tool
+# Author: Ryan Lupinski (https://github.com/ryanlupinski)
+# Description: This python script automateS the investing strategy of Meb Faber's 'Trinity Portfolio'
+# as described here: https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf
+# --------------------------------------------------------------------------- #
 
+# Import Modules ------------------------------------------------------------ #
 import datetime as dt
 import os
 import pandas as pd
@@ -7,8 +13,11 @@ import pandas_datareader.data as web
 from pandas.tseries.offsets import BDay
 from dateutil.relativedelta import *
 
-# Define ETFs in Portfolio
-portfolio = [
+# --------------------------------------------------------------------------- #
+
+# Data ---------------------------------------------------------------------- #
+# List of ETFs that make up the portfolio
+lstETFs = [
     'MTUM',  # US Stocks Momentum
     'VTV',  # US Stocks Value
     'VEU',  # Foreign Developed Stock
@@ -21,59 +30,103 @@ portfolio = [
     'IAU',  # Gold
     'VNQ',  # REITS
 ]
-
-# Define time frames
 today = dt.date.today()
-lastTradingDayOfMonth = dt.date(today.year, today.month, 1) - relativedelta(months=0, days=0) - BDay(1)
-one_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=0, days=0) - BDay()
-three_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=2, days=0) - BDay()
-six_month = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=5, days=0) - BDay()
-one_year = dt.date(lastTradingDayOfMonth.year, lastTradingDayOfMonth.month, 1) - relativedelta(months=11, days=0) - BDay()
 
-print(lastTradingDayOfMonth, one_month, three_month, six_month, one_year, sep="\n")
 
-# Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs
-ETF_price_data_one_month = web.DataReader(portfolio, 'yahoo', one_month, lastTradingDayOfMonth)['Adj Close']
-ETF_price_data_three_month = web.DataReader(portfolio, 'yahoo', three_month, lastTradingDayOfMonth)['Adj Close']
-ETF_price_data_six_month = web.DataReader(portfolio, 'yahoo', six_month, lastTradingDayOfMonth)['Adj Close']
-ETF_price_data_one_year = web.DataReader(portfolio, 'yahoo', one_year, lastTradingDayOfMonth)['Adj Close']
-ETF_price_data_latest = ETF_price_data_one_year.tail(1)
+# --------------------------------------------------------------------------- #
 
-# Create data frames of 200 day simple moving average
-ETF_price_data_one_year_close = web.DataReader(portfolio, 'yahoo', one_year, lastTradingDayOfMonth)['Close']
-ETF_price_data_200D_SMA = ETF_price_data_one_year_close.rolling(window=200).mean()
-ETF_price_data_200D_SMA_latest = ETF_price_data_200D_SMA.tail(1)
+# Processing  --------------------------------------------------------------- #
+class Processor:
+    @staticmethod
+    def time_frame(years, months):
+        """
+        Returns a business date in the past based on years and months parameter
+        time_frame(years=1, months=0) returns the last business day 1 year from today()
+        time_frame(years=8, months=1) returns the last business day 8 years and 1 month from today()
+        :param years: int, years in the past
+        :param months: int, months in the past
+        :return: date
+        """
+        dateReturn = dt.datetime(today.year, today.month, 1) - relativedelta(years=years, months=months) - BDay()
+        return dateReturn
+
+    @staticmethod
+    def price_data(etfs, time_frame):
+        """
+        Given a time frame and list of ETFs, returns a dataframe of price data
+        returns a dataframe of price data for a list of ETFs over a specific time frame
+        :param etfs: ETF symbols to get price from
+        :param time_frame: time frame as variable pointing to <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+        :return: dataframe of price data
+        """
+        dfPriceData = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
+        return dfPriceData
+
+    @staticmethod
+    def moving_average(etfs, time_frame):
+        """
+        Calculates 200 day moving average for ETFs and returns dataframe of latest average
+        for the given time frame
+        :param etfs: ETF symbols to get price from
+        :param time_frame: start date of time frame
+        :return: dataframe of 200 day moving averages for each ETF
+        """
+        df = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
+        dfMovingAverage = df.rolling(window=200).mean()
+        return dfMovingAverage
+
+    @staticmethod
+    def total_returns(df):
+        """
+        Calculates total return of ETFs for each dataframe
+        :param df: dataframe to find total returns
+        :return: dataframe of returns
+        """
+        dfPercentChange = df.pct_change()
+        dfCumulativeReturn = ((1 + dfPercentChange).cumprod() - 1)
+        dfCumulativeReturnLatest = dfCumulativeReturn.tail(1)
+        return dfCumulativeReturnLatest
+
+
+# Main ---------------------------------------------------------------------- #
+# Define time frames
+lastTradingDayOfMonth = Processor.time_frame(years=0, months=0)
+oneMonth = Processor.time_frame(years=0, months=1)
+threeMonths = Processor.time_frame(years=0, months=3)
+sixMonths = Processor.time_frame(years=0, months=6)
+oneYear = Processor.time_frame(years=1, months=0)
+
+# Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs in portfolio
+dfETFPriceDataOneMonth = Processor.price_data(etfs=lstETFs, time_frame=oneMonth)
+dfETFPriceDataThreeMonth = Processor.price_data(etfs=lstETFs, time_frame=threeMonths)
+dfETFPriceDataSixMonth = Processor.price_data(etfs=lstETFs, time_frame=sixMonths)
+dfETFPriceDataOneYear = Processor.price_data(etfs=lstETFs, time_frame=oneYear)
+dfETFPriceDataLatest = dfETFPriceDataOneYear.tail(1)
+
+# Create dataframes of 200 day simple moving average for all ETFs in portfolio
+dfETF200DayMovingAverage = Processor.moving_average(etfs=lstETFs, time_frame=oneYear)
+dfETF200DayMovingAverageLatest = dfETF200DayMovingAverage.tail(1)
 
 # Calculate 1m, 3m, 6m, & 1y returns for all ETFs in portfolio
-# 1 month
-Portfolio_one_month_daily_return = ETF_price_data_one_month.pct_change()
-Portfolio_one_month_cumulative_return = ((1 + Portfolio_one_month_daily_return).cumprod() - 1)
-Portfolio_one_month_cumulative_return = Portfolio_one_month_cumulative_return.tail(1)
-# 3 month
-Portfolio_three_month_daily_return = ETF_price_data_three_month.pct_change()
-Portfolio_three_month_cumulative_return = ((1 + Portfolio_three_month_daily_return).cumprod() - 1)
-Portfolio_three_month_cumulative_return = Portfolio_three_month_cumulative_return.tail(1)
-# 6 month
-Portfolio_six_month_daily_return = ETF_price_data_six_month.pct_change()
-Portfolio_six_month_cumulative_return = ((1 + Portfolio_six_month_daily_return).cumprod() - 1)
-Portfolio_six_month_cumulative_return = Portfolio_six_month_cumulative_return.tail(1)
-# 1 year
-Portfolio_one_year_daily_return = ETF_price_data_one_year.pct_change()
-Portfolio_one_year_cumulative_return = ((1 + Portfolio_one_year_daily_return).cumprod() - 1)
-Portfolio_one_year_cumulative_return = Portfolio_one_year_cumulative_return.tail(1)
+dfETFOneMonthTotalReturn = Processor.total_returns(dfETFPriceDataOneMonth)
+dfETFThreeMonthTotalReturn = Processor.total_returns(dfETFPriceDataThreeMonth)
+dfETFSixMonthTotalReturn = Processor.total_returns(dfETFPriceDataSixMonth)
+dfETFOneYearTotalReturn = Processor.total_returns(dfETFPriceDataOneYear)
 
-Returns_concatenated = [
-    Portfolio_one_month_cumulative_return,
-    Portfolio_three_month_cumulative_return,
-    Portfolio_six_month_cumulative_return,
-    Portfolio_one_year_cumulative_return
+lstOfTotalReturns = [
+    dfETFOneMonthTotalReturn,
+    dfETFThreeMonthTotalReturn,
+    dfETFSixMonthTotalReturn,
+    dfETFOneYearTotalReturn
 ]
 
-Portfolio_returns = pd.concat(Returns_concatenated)
-Portfolio_returns = Portfolio_returns.assign(Returns=['1 month', '3 month', '6 month', '1 year'])
+dfTotalReturns = pd.concat(lstOfTotalReturns)
+dfTotalReturns = dfTotalReturns.assign(Returns=['1 month', '3 month', '6 month', '1 year'])
 
 # Create csvs for closing price data, 200 day simple moving average data, and returns data
 path = os.getcwd() + "/CSVs"
-ETF_price_data_one_year.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
-ETF_price_data_200D_SMA_latest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
-Portfolio_returns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
+dfETFPriceDataOneYear.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
+dfETF200DayMovingAverageLatest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
+dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
+
+print("csvs created! Add each csv to the appropriate sheet in Portfolio Optimization Tool.xlsx")

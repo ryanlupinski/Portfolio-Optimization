@@ -2,7 +2,6 @@
 
 ## Preface
 - I wanted to learn python, so I decided to build a tool that would help me invest my money in a quantitative, un-biased, and methodical strategy.
-- I built this tool without any formal python training. <mark>It is very 'un-pythonic' in its current state. Bare with me as I make updates and improve the tool<mark>.
 - I am learning to use GitHub and GitHub Pages to build a portfolio of my projects and document how I am learning python and improving the tool.
 
 ## Summary
