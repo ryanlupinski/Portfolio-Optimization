@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 # Title: Portfolio Optimization Tool
 # Author: Ryan Lupinski (https://github.com/ryanlupinski)
-# Description: This python script automateS the investing strategy of Meb Faber's 'Trinity Portfolio'
+# Description: This python script automates the investing strategy of Meb Faber's 'Trinity Portfolio'
 # as described here: https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf
 # --------------------------------------------------------------------------- #
 
@@ -130,3 +130,5 @@ dfETF200DayMovingAverageLatest.to_csv(os.path.join(path, r'Portfolio Latest 200D
 dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
 
 print("csvs created! Add each csv to the appropriate sheet in Portfolio Optimization Tool.xlsx")
+
+## backtesting.py
