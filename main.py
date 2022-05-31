@@ -6,13 +6,16 @@
 # --------------------------------------------------------------------------- #
 
 # Import Modules ------------------------------------------------------------ #
-import datetime as dt
-import os
-import pandas as pd
-import pandas_datareader.data as web
-from pandas.tseries.offsets import BDay
-from dateutil.relativedelta import *
-
+if __name__ == "__main__":
+    import datetime as dt
+    import os
+    import pandas as pd
+    import pandas_datareader.data as web
+    from pandas.tseries.offsets import BDay
+    from dateutil.relativedelta import *
+    # from backtest import Portfolio
+else:
+    raise Exception("This file was not created to be imported")
 # --------------------------------------------------------------------------- #
 
 # Data ---------------------------------------------------------------------- #
@@ -129,6 +132,4 @@ dfETFPriceDataOneYear.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price
 dfETF200DayMovingAverageLatest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
 dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
 
-print("csvs created! Add each csv to the appropriate sheet in Portfolio Optimization Tool.xlsx")
-
-## backtesting.py
+print("CSVs created! Add each csv to the appropriate sheet in Portfolio Optimization Tool.xlsx")
