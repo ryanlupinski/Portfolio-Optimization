@@ -12,6 +12,7 @@ if __name__ == "__main__":
     import pandas as pd
     import pandas_datareader.data as web
     from pandas.tseries.offsets import BDay
+    from pandas.tseries.offsets import BMonthEnd
     from dateutil.relativedelta import *
     # from backtest import Portfolio
 else:
@@ -93,11 +94,17 @@ class Processor:
 
 # Main ---------------------------------------------------------------------- #
 # Define time frames
-lastTradingDayOfMonth = Processor.time_frame(years=0, months=0)
-oneMonth = Processor.time_frame(years=0, months=1)
-threeMonths = Processor.time_frame(years=0, months=3)
-sixMonths = Processor.time_frame(years=0, months=6)
-oneYear = Processor.time_frame(years=1, months=0)
+lastTradingDayOfMonth = Processor.time_frame(years=0, months=-1)
+oneMonth = Processor.time_frame(years=0, months=0)
+threeMonths = Processor.time_frame(years=0, months=2)
+sixMonths = Processor.time_frame(years=0, months=5)
+oneYear = Processor.time_frame(years=0, months=11)
+
+print(f"The last trading day of the month is {lastTradingDayOfMonth}")
+print(f"One month ago was {oneMonth}")
+print(f"Three months ago was {threeMonths}")
+print(f"Six month ago was {sixMonths}")
+print(f"One year ago was {oneYear}")
 
 # Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs in portfolio
 dfETFPriceDataOneMonth = Processor.price_data(etfs=lstETFs, time_frame=oneMonth)
