@@ -10,11 +10,9 @@ if __name__ == "__main__":
     import datetime as dt
     import os
     import pandas as pd
-    import pandas_datareader.data as web
-    from pandas.tseries.offsets import BDay
-    from pandas.tseries.offsets import BMonthEnd
-    from dateutil.relativedelta import *
-    # from backtest import Portfolio
+    from portfolio import Portfolio
+    from processing import Processor
+    from pandas.tseries.offsets import BMonthEnd, BDay
 else:
     raise Exception("This file was not created to be imported")
 # --------------------------------------------------------------------------- #
@@ -34,77 +32,24 @@ lstETFs = [
     'IAU',  # Gold
     'VNQ',  # REITS
 ]
-today = dt.date.today()
-
 
 # --------------------------------------------------------------------------- #
 
-# Processing  --------------------------------------------------------------- #
-class Processor:
-    @staticmethod
-    def time_frame(years, months):
-        """
-        Returns a business date in the past based on years and months parameter
-        time_frame(years=1, months=0) returns the last business day 1 year from today()
-        time_frame(years=8, months=1) returns the last business day 8 years and 1 month from today()
-        :param years: int, years in the past
-        :param months: int, months in the past
-        :return: date
-        """
-        dateReturn = dt.datetime(today.year, today.month, 1) - relativedelta(years=years, months=months) - BDay()
-        return dateReturn
-
-    @staticmethod
-    def price_data(etfs, time_frame):
-        """
-        Given a time frame and list of ETFs, returns a dataframe of price data
-        returns a dataframe of price data for a list of ETFs over a specific time frame
-        :param etfs: ETF symbols to get price from
-        :param time_frame: time frame as variable pointing to <class 'pandas._libs.tslibs.timestamps.Timestamp'>
-        :return: dataframe of price data
-        """
-        dfPriceData = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
-        return dfPriceData
-
-    @staticmethod
-    def moving_average(etfs, time_frame):
-        """
-        Calculates 200 day moving average for ETFs and returns dataframe of latest average
-        for the given time frame
-        :param etfs: ETF symbols to get price from
-        :param time_frame: start date of time frame
-        :return: dataframe of 200 day moving averages for each ETF
-        """
-        df = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
-        dfMovingAverage = df.rolling(window=200).mean()
-        return dfMovingAverage
-
-    @staticmethod
-    def total_returns(df):
-        """
-        Calculates total return of ETFs for each dataframe
-        :param df: dataframe to find total returns
-        :return: dataframe of returns
-        """
-        dfPercentChange = df.pct_change()
-        dfCumulativeReturn = ((1 + dfPercentChange).cumprod() - 1)
-        dfCumulativeReturnLatest = dfCumulativeReturn.tail(1)
-        return dfCumulativeReturnLatest
-
-
 # Main ---------------------------------------------------------------------- #
 # Define time frames
-lastTradingDayOfMonth = Processor.time_frame(years=0, months=-1)
-oneMonth = Processor.time_frame(years=0, months=0)
-threeMonths = Processor.time_frame(years=0, months=2)
-sixMonths = Processor.time_frame(years=0, months=5)
-oneYear = Processor.time_frame(years=0, months=11)
+today = dt.date.today()
+lastTradingDayOfMonth = Processor.last_trading_day()
+oneMonth = lastTradingDayOfMonth - BMonthEnd(1)
+threeMonths = lastTradingDayOfMonth - BMonthEnd(3)
+sixMonths = lastTradingDayOfMonth - BMonthEnd(6)
+oneYear = lastTradingDayOfMonth - BMonthEnd(12)
 
-print(f"The last trading day of the month is {lastTradingDayOfMonth}")
-print(f"One month ago was {oneMonth}")
-print(f"Three months ago was {threeMonths}")
-print(f"Six month ago was {sixMonths}")
-print(f"One year ago was {oneYear}")
+print(f"Today: {today}")
+print(f"Last trading day: {lastTradingDayOfMonth}")
+print(f"One month from last trading: {oneMonth}")
+print(f"Three months from last trading day: {threeMonths}")
+print(f"Six month from last trading day: {sixMonths}")
+print(f"One year from last trading day: {oneYear}")
 
 # Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs in portfolio
 dfETFPriceDataOneMonth = Processor.price_data(etfs=lstETFs, time_frame=oneMonth)
