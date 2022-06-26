@@ -3,8 +3,7 @@ if __name__ == "__main__":
 else:
     import datetime as dt
     import pandas_datareader.data as web
-    from pandas.tseries.offsets import BDay, BMonthEnd
-    from dateutil.relativedelta import *
+    from pandas.tseries.offsets import BMonthEnd
 
 # Data ---------------------------------------------------------------------- #
 today = dt.date.today()
@@ -29,30 +28,32 @@ class Processor:
         return lastTradingDayOfMonth
 
     @staticmethod
-    def price_data(etfs, time_frame):
+    def price_data(etfs, start_date, end_date, OHLCVAC):
         """
-        Given a time frame and list of ETFs, returns a dataframe of price data
-        returns a dataframe of price data for a list of ETFs over a specific time frame
+        Returns a dataframe of price data for a list of ETFs over a specific time frame
+        :param OHLCVAC: choose 1 item: 'Open', 'High', 'Low', 'Close', 'Volume', or 'Adj Close'
+        :param end_date: last day of time frame to return price data
         :param etfs: ETF symbols to get price from
-        :param time_frame: time frame as variable pointing to <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+        :param start_date: first day of time frame to return price data
         :return: dataframe of price data
         """
-        lastTradingDayOfMonth = Processor.last_trading_day()
-        dfPriceData = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
+        dfPriceData = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
         return dfPriceData
 
     @staticmethod
-    def moving_average(etfs, time_frame):
+    def moving_average(etfs, start_date, end_date, OHLCVAC, window):
         """
         Calculates 200 day moving average for ETFs and returns dataframe of latest average
         for the given time frame
+        :param window: int: window of days to calculate average
+        :param OHLCVAC: choose 1 item: 'Open', 'High', 'Low', 'Close', 'Volume', or 'Adj Close'
+        :param end_date: last day of time frame to return price data
+        :param start_date: first day of time frame to return price data
         :param etfs: ETF symbols to get price from
-        :param time_frame: start date of time frame
         :return: dataframe of 200 day moving averages for each ETF
         """
-        lastTradingDayOfMonth = Processor.last_trading_day()
-        df = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
-        dfMovingAverage = df.rolling(window=200).mean()
+        df = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
+        dfMovingAverage = df.rolling(window=window).mean()
         return dfMovingAverage
 
     @staticmethod

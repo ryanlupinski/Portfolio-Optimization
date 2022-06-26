@@ -105,24 +105,25 @@ of 1,3,6,12 months using the following code. `dfETFPriceDataLatest = dfETFPriceD
 ----- processing.py ------------
 class Processor:    
     @staticmethod
-    def price_data(etfs, time_frame):
+    def price_data(etfs, start_date, end_date, OHLCVAC):
         """
-        Given a time frame and list of ETFs, returns a dataframe of price data
-        returns a dataframe of price data for a list of ETFs over a specific time frame
+        Returns a dataframe of price data for a list of ETFs over a specific time frame
+        :param OHLCVAC: choose 1 item: 'Open', 'High', 'Low', 'Close', 'Volume', or 'Adj Close'
+        :param end_date: last day of time frame to return price data
         :param etfs: ETF symbols to get price from
-        :param time_frame: time frame as variable pointing to <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+        :param start_date: first day of time frame to return price data
         :return: dataframe of price data
         """
-        dfPriceData = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
+        dfPriceData = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
         return dfPriceData
 
 ----- processing.py ------------
 
-# Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs in portfolio
-dfETFPriceDataOneMonth = Processor.price_data(etfs=lstETFs, time_frame=oneMonth)
-dfETFPriceDataThreeMonth = Processor.price_data(etfs=lstETFs, time_frame=threeMonths)
-dfETFPriceDataSixMonth = Processor.price_data(etfs=lstETFs, time_frame=sixMonths)
-dfETFPriceDataOneYear = Processor.price_data(etfs=lstETFs, time_frame=oneYear)
+# Create 1m, 3m, 6m, & 1y data frames of daily adjusted closing price for all ETFs in portfolio
+dfETFPriceDataOneMonth = Processor.price_data(etfs=lstETFs, start_date=oneMonth, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
+dfETFPriceDataThreeMonth = Processor.price_data(etfs=lstETFs, start_date=threeMonths, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
+dfETFPriceDataSixMonth = Processor.price_data(etfs=lstETFs, start_date=sixMonths, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
+dfETFPriceDataOneYear = Processor.price_data(etfs=lstETFs, start_date=oneYear, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
 dfETFPriceDataLatest = dfETFPriceDataOneYear.tail(1)
 ```
 
@@ -173,22 +174,25 @@ day of the month.
 ----- processing.py ------------
 class Processor: 
     @staticmethod
-    def moving_average(etfs, time_frame):
+    def moving_average(etfs, start_date, end_date, OHLCVAC, window):
         """
         Calculates 200 day moving average for ETFs and returns dataframe of latest average
         for the given time frame
+        :param window: int: window of days to calculate average
+        :param OHLCVAC: choose 1 item: 'Open', 'High', 'Low', 'Close', 'Volume', or 'Adj Close'
+        :param end_date: last day of time frame to return price data
+        :param start_date: first day of time frame to return price data
         :param etfs: ETF symbols to get price from
-        :param time_frame: start date of time frame
         :return: dataframe of 200 day moving averages for each ETF
         """
-        df = web.DataReader(etfs, 'yahoo', start=time_frame, end=lastTradingDayOfMonth)['Adj Close']
-        dfMovingAverage = df.rolling(window=200).mean()
+        df = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
+        dfMovingAverage = df.rolling(window=window).mean()
         return dfMovingAverage
 
 ----- processing.py ------------
 
 # Create dataframes of 200 day simple moving average for all ETFs in portfolio
-dfETF200DayMovingAverage = Processor.moving_average(etfs=lstETFs, time_frame=oneYear)
+dfETF200DayMovingAverage = Processor.moving_average(etfs=lstETFs, start_date=oneYear, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close', window=200)
 dfETF200DayMovingAverageLatest = dfETF200DayMovingAverage.tail(1)
 ```
 ### Export dataframes as CSVs

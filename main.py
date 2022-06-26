@@ -51,15 +51,15 @@ print(f"Three months from last trading day: {threeMonths}")
 print(f"Six month from last trading day: {sixMonths}")
 print(f"One year from last trading day: {oneYear}")
 
-# Create 1m, 3m, 6m, & 1y data frames of daily closing price for all ETFs in portfolio
-dfETFPriceDataOneMonth = Processor.price_data(etfs=lstETFs, time_frame=oneMonth)
-dfETFPriceDataThreeMonth = Processor.price_data(etfs=lstETFs, time_frame=threeMonths)
-dfETFPriceDataSixMonth = Processor.price_data(etfs=lstETFs, time_frame=sixMonths)
-dfETFPriceDataOneYear = Processor.price_data(etfs=lstETFs, time_frame=oneYear)
+# Create 1m, 3m, 6m, & 1y data frames of daily adjusted closing price for all ETFs in portfolio
+dfETFPriceDataOneMonth = Processor.price_data(etfs=lstETFs, start_date=oneMonth, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
+dfETFPriceDataThreeMonth = Processor.price_data(etfs=lstETFs, start_date=threeMonths, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
+dfETFPriceDataSixMonth = Processor.price_data(etfs=lstETFs, start_date=sixMonths, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
+dfETFPriceDataOneYear = Processor.price_data(etfs=lstETFs, start_date=oneYear, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close')
 dfETFPriceDataLatest = dfETFPriceDataOneYear.tail(1)
 
 # Create dataframes of 200 day simple moving average for all ETFs in portfolio
-dfETF200DayMovingAverage = Processor.moving_average(etfs=lstETFs, time_frame=oneYear)
+dfETF200DayMovingAverage = Processor.moving_average(etfs=lstETFs, start_date=oneYear, end_date=lastTradingDayOfMonth, OHLCVAC='Adj Close', window=200)
 dfETF200DayMovingAverageLatest = dfETF200DayMovingAverage.tail(1)
 
 # Calculate 1m, 3m, 6m, & 1y returns for all ETFs in portfolio
