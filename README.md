@@ -32,7 +32,7 @@ portfolio = [
     'IAU',  # Gold
     'VNQ',  # REITS
 ]
-``` 
+```
 Listing 1. List of ETF symbol names
 
 ## 2nd 50%: Momentum and Trend-Following
@@ -94,9 +94,9 @@ oneYear = lastTradingDayOfMonth - BMonthEnd(12)
 
 Now we have the start and end dates for scraping price data and determining ETF returns and calculating the 200-day moving average.
 
-### Using Pandas 
+### Using Pandas
 The tool's initial version uses pandas to create dataframes for all the ETFs price data and stores them in memory and timeframes of 1m, 3m, 6m, and 12m from the datetime module.
-This is not the best way to do this (i.e. without using functions and objects) but later versions will correct this and handle more 
+This is not the best way to do this (i.e. without using functions and objects) but later versions will correct this and handle more
 of the methodology entirely in python as etf objects, vs dataframes like in R programming.
 
 The `pandas` library and `pandas_datareader.data` as `web` give the tool functionality to retrieve stock/etf price data and save dataframes
@@ -128,9 +128,9 @@ dfETFPriceDataLatest = dfETFPriceDataOneYear.tail(1)
 ```
 
 ### Total Returns
-Now that we have dataframes of price data, we can calculate the total return 
+Now that we have dataframes of price data, we can calculate the total return
 for each timeframe then concatenate the results using `pd.concate` to a list of returns.
-The .tail(1) returns the return on the last day of the timeframe, which is the only one we care about. 
+The .tail(1) returns the return on the last day of the timeframe, which is the only one we care about.
 ```python
 ----- processing.py ------------
 class Processor:   
@@ -169,10 +169,10 @@ dfTotalReturns = dfTotalReturns.assign(Returns=['1 month', '3 month', '6 month',
 The 1-year time frame must be used (for obvious reasons) to calculate the 200-Day SMA. The `.rolling`
 function gives us our window parameter and the `.mean()` function averages over the
 window. Again, `.tail()` returns only the last day's 200-Day SMA, so we can compare against the closing price on the last trading
-day of the month. 
+day of the month.
 ```python
 ----- processing.py ------------
-class Processor: 
+class Processor:
     @staticmethod
     def moving_average(etfs, start_date, end_date, OHLCVAC, window):
         """
@@ -207,12 +207,12 @@ dfETF200DayMovingAverageLatest.to_csv(os.path.join(path, r'Portfolio Latest 200D
 dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
 ```
 ### Final Output
-The tool was run on 4-30-22 and the formulas in the spreadsheet implement the logic
+The tool was run on 6-30-22 and the formulas in the spreadsheet implement the logic
 described in the pseudocode above. This would give the user the percent allocation his or her
-portfolio should have for the following month, 5/22.
+portfolio should have for the following month, 7/22.
 
-![portfolio 4-30-22](docs/portfolio-4-30-22.png?raw=true)
-Figure 2. Output in Excel showing allocation for the month of 5/22
+![portfolio 6-30-22](docs/portfolio-6-30-22.png?raw=true)
+Figure 2. Output in Excel showing allocation for the month of 7/22
 
 ### References
  - Meb Faber (2016). [The Trinity Portfolio](https://www.cambriainvestments.com/wp-content/uploads/2016/07/Trinity_DIGITAL_final.pdf)
