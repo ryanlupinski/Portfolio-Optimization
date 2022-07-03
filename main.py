@@ -26,7 +26,7 @@ lstETFs = [
     'VWO',  # Foreign Emerging Stocks
     'VCIT',  # Corporate Bonds
     'VGLT',  # 30Y Bonds
-    'BNDX',  # 10Y Foreign BondsPo
+    'BNDX',  # 10Y Foreign Bonds
     'VTIP',  # TIPS
     'DBC',  # Commodities
     'IAU',  # Gold
