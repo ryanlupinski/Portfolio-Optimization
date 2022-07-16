@@ -90,7 +90,7 @@ print(f"The tool will begin at index: {tsIndexPointer}")
 
 # Check to see if ETF Returns and Ranks data exist in /Data/Dataframes/ETF Returns and Ranks
 try:
-    path = "/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Data/Dataframes/ETF Returns and Ranks"
+    path = os.getcwd() + "Data/Dataframes/ETF Returns and Ranks"
     # If it already exists, load data
     dictOfETFReturnsDataframes = {}
     for etf in lstETFs:
@@ -127,7 +127,7 @@ if tsLastTradingDay > tsLatestClosingPriceData:
                                                  end_date=tsLastTradingDay,
                                                  OHLCVAC='Adj Close')
     dfClosingPriceDataTenYears = dfClosingPriceDataTenYears.append(dfNewClosingPriceData, verify_integrity=True)
-    path = "/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Data/Dataframes"
+    path = os.getcwd() + "Data/Dataframes"
     dfClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfClosingPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
     tsLatestClosingPriceData = dfClosingPriceDataTenYears.index[-1]  # reset tsLatestClosingPriceData
@@ -146,7 +146,7 @@ if tsLastTradingDay > tsLatest200DSMAData:
                                                     window=200)
     dfNew200DSMATenYears = dfNew200DSMATenYears.loc[tsLatest200DSMAData:] # splice only new index dates to append
     df200DSMATenYears = df200DSMATenYears.append(dfNew200DSMATenYears, verify_integrity=True)
-    path = "/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Data/Dataframes"
+    path = os.getcwd() + "Data/Dataframes"
     df200DSMATenYears.to_csv(os.path.join(path, r'df200DSMATenYears.csv'), na_rep='nan',
                              date_format='%Y-%m-%d %H:%M:%S')
     tsLatest200DSMAData = df200DSMATenYears.index[-1]  # reset tsLatest200DSMAData
@@ -168,7 +168,7 @@ while True:
         break
 
 # save each dataframe in dict to csv
-path = "/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/Data/Dataframes/ETF Returns and Ranks"
+path = os.getcwd() + "Data/Dataframes/ETF Returns and Ranks"
 for etf in dictOfETFReturnsDataframes:
     dictOfETFReturnsDataframes[etf].to_csv(os.path.join(path, str(etf) + '.csv'),
                                            na_rep='nan', date_format='%Y-%m-%d %H:%M:%S')
