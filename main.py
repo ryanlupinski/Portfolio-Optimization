@@ -11,7 +11,7 @@ if __name__ == "__main__":
     import pandas as pd
     # from portfolio import Portfolio
     from processing import Processor
-    from pandas.tseries.offsets import BMonthEnd
+    from pandas.tseries.offsets import BMonthEnd, BDay
 else:
     raise Exception("This file was not created to be imported")
 # --------------------------------------------------------------------------- #
@@ -70,7 +70,7 @@ except:
     df200DSMATenYears = Processor.moving_average(etfs=lstETFs, start_date=tsTenYears, end_date=tsLastTradingDay,
                                                  OHLCVAC='Adj Close', window=200)
     # Save dataframe of 10 years of 200D SMA data to /Data/Dataframes
-    path = os.getcwd() + "Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes"
     df200DSMATenYears.to_csv(os.path.join(path, r'df200DSMATenYears.csv'), na_rep='nan',
                              date_format='%Y-%m-%d %H:%M:%S')
 
@@ -90,7 +90,7 @@ print(f"The tool will begin at index: {tsIndexPointer}")
 
 # Check to see if ETF Returns and Ranks data exist in /Data/Dataframes/ETF Returns and Ranks
 try:
-    path = os.getcwd() + "Data/Dataframes/ETF Returns and Ranks"
+    path = os.getcwd() + "/Data/Dataframes/ETF Returns and Ranks"
     # If it already exists, load data
     dictOfETFReturnsDataframes = {}
     for etf in lstETFs:
@@ -101,9 +101,16 @@ try:
         dictOfETFReturnsDataframes.update({x: df})
 except:
     print('Creating Returns and Ranks dataframes')
-    # Create dict of dataframes for each ETFs returns and rank
-    # awesome function here
-    # save each dataframe in dict to csv file at path
+    # Create dict of dataframes for each ETF's returns and rank
+    dictOfETFReturnsDataframes = Processor.returns_and_rank(tsStart=tsIndexPointer,
+                                                            tsEnd=tsLastTradingDay,
+                                                            dfClosingPrice=dfClosingPriceDataTenYears)
+    x = list(dictOfETFReturnsDataframes.keys())[0]
+    # save each dataframe in dict to csv
+    path = os.getcwd() + "/Data/Dataframes/ETF Returns and Ranks"
+    for etf in dictOfETFReturnsDataframes:
+        dictOfETFReturnsDataframes[etf].to_csv(os.path.join(path, str(etf) + '.csv'),
+                                               na_rep='nan', date_format='%Y-%m-%d %H:%M:%S')
 
 # --------------------------------------------------------------------------- #
 
@@ -127,7 +134,7 @@ if tsLastTradingDay > tsLatestClosingPriceData:
                                                  end_date=tsLastTradingDay,
                                                  OHLCVAC='Adj Close')
     dfClosingPriceDataTenYears = dfClosingPriceDataTenYears.append(dfNewClosingPriceData, verify_integrity=True)
-    path = os.getcwd() + "Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes"
     dfClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfClosingPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
     tsLatestClosingPriceData = dfClosingPriceDataTenYears.index[-1]  # reset tsLatestClosingPriceData
@@ -144,9 +151,9 @@ if tsLastTradingDay > tsLatest200DSMAData:
                                                     end_date=tsLastTradingDay,
                                                     OHLCVAC='Adj Close',
                                                     window=200)
-    dfNew200DSMATenYears = dfNew200DSMATenYears.loc[tsLatest200DSMAData:] # splice only new index dates to append
+    dfNew200DSMATenYears = dfNew200DSMATenYears.loc[tsLatest200DSMAData:]  # splice only new index dates to append
     df200DSMATenYears = df200DSMATenYears.append(dfNew200DSMATenYears, verify_integrity=True)
-    path = os.getcwd() + "Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes"
     df200DSMATenYears.to_csv(os.path.join(path, r'df200DSMATenYears.csv'), na_rep='nan',
                              date_format='%Y-%m-%d %H:%M:%S')
     tsLatest200DSMAData = df200DSMATenYears.index[-1]  # reset tsLatest200DSMAData
@@ -156,23 +163,21 @@ else:
 # !!! SECTION FOR NEW RETURNS AND RANKS DATA NOT CURRENTLY IN CSV !!!
 while True:
     if tsLastTradingDay > tsLatestReturnsData:
-        tsLatestReturnsData = tsLatestReturnsData + BMonthEnd() # advance tsLatestReturnsData to next BMonthEnd day so no index overlap
+        tsLatestReturnsData = tsLatestReturnsData + BMonthEnd()  # advance tsLatestReturnsData to next BMonthEnd day so no index overlap
         Processor.returns_and_rank(tsStart=tsLatestReturnsData,
                                    tsEnd=tsLastTradingDay,
                                    dfClosingPrice=dfClosingPriceDataTenYears,
                                    dictOfReturns=dictOfETFReturnsDataframes)
         x = list(dictOfETFReturnsDataframes.keys())[0]
+        # save each dataframe in dict to csv
+        path = os.getcwd() + "/Data/Dataframes/ETF Returns and Ranks"
+        for etf in dictOfETFReturnsDataframes:
+            dictOfETFReturnsDataframes[etf].to_csv(os.path.join(path, str(etf) + '.csv'),
+                                                   na_rep='nan', date_format='%Y-%m-%d %H:%M:%S')
         tsLatestReturnsData = dictOfETFReturnsDataframes[x].index[-1]  # reset tsLatestReturnsData
     else:
         print("dictOfETFReturnsDataframes is up to date")
         break
-
-# save each dataframe in dict to csv
-path = os.getcwd() + "Data/Dataframes/ETF Returns and Ranks"
-for etf in dictOfETFReturnsDataframes:
-    dictOfETFReturnsDataframes[etf].to_csv(os.path.join(path, str(etf) + '.csv'),
-                                           na_rep='nan', date_format='%Y-%m-%d %H:%M:%S')
-
 
 tsIndexDateOneMonth = tsLastTradingDay - BMonthEnd(1)
 tsIndexDateThreeMonth = tsLastTradingDay - BMonthEnd(3)

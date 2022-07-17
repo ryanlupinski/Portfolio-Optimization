@@ -21,6 +21,7 @@ lstETFs = [
     'VNQ',  # REITS
 ]
 
+
 # Processing  --------------------------------------------------------------- #
 class Processor:
     @staticmethod
@@ -156,9 +157,20 @@ class Processor:
                 dfETFOneYearTotalReturn = Processor.total_returns(dfETFPriceDataOneYear)
 
                 # Create a dict of dataframes of ETF returns + averages
-                # If there is no dict of returns and rank data, create empty dict
+                # If there is no dict of returns and rank data, create dict of empty dataframes
                 if dictOfReturns is None:
-                    dictOfReturns = {}
+                    dictOfReturns = {'dfMTUM': pd.DataFrame(),
+                                     'dfVTV': pd.DataFrame(),
+                                     'dfVEU': pd.DataFrame(),
+                                     'dfVWO': pd.DataFrame(),
+                                     'dfVCIT': pd.DataFrame(),
+                                     'dfVGLT': pd.DataFrame(),
+                                     'dfBNDX': pd.DataFrame(),
+                                     'dfVTIP': pd.DataFrame(),
+                                     'dfDBC': pd.DataFrame(),
+                                     'dfIAU': pd.DataFrame(),
+                                     'dfVNQ': pd.DataFrame()
+                                     }
                 # Create temp dict for loading new returns and ranks dataframes
                 dictTemp = {}
                 for etf in lstETFs:
@@ -176,8 +188,8 @@ class Processor:
 
                 # add ranks to new column in each dataframe
                 dictTemp = Processor.add_rank_to_dict_of_returns(lstETFs=lstETFs,
-                                                                      dictDF=dictTemp,
-                                                                      rankDF=dictOfAveragesRanked)
+                                                                 dictDF=dictTemp,
+                                                                 rankDF=dictOfAveragesRanked)
 
                 # append each dataframe in dict with new returns and ranks data
                 for key in dictOfReturns:
