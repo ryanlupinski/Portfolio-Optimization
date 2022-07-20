@@ -2,9 +2,9 @@ class Portfolio:
     """
     Portfolio Object
     portfolio = {
-    "etf ticker 1": {'rank': int, 'closing price': %.2f, 'opening price': %.2f, '200D MA': %.2f, 'shares': int},
-    "etf ticker n": {'rank': int, 'closing price': %.2f, 'opening price': %.2f, '200D MA': %.2f, 'shares': int},
-    {'Cash': int}
+    'Cash': int
+    'etf ticker 1': {'rank': int, 'closing price': %.2f, 'opening price': %.2f, '200D MA': %.2f, 'shares': int},
+    'etf ticker n': {'rank': int, 'closing price': %.2f, 'opening price': %.2f, '200D MA': %.2f, 'shares': int},
     }
     """
 
@@ -81,7 +81,7 @@ class Portfolio:
 
     def setPortfolioCash(self, cash_delta):
         currentCashValue = self.__portfolioAssets.get('Cash')
-        setCashValue = cash_delta + currentCashValue
+        setCashValue = currentCashValue - cash_delta
         if setCashValue < 0.00:
             print("Insufficient cash for transaction")
         else:

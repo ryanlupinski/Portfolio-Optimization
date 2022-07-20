@@ -135,7 +135,7 @@ class Processor:
         return dictDF
 
     @staticmethod
-    def returns_and_rank(tsStart, tsEnd, dfClosingPrice, dictOfReturns=None):
+    def returns_and_rank(tsStart, tsEnd, dfAdjClosingPrice, dictOfReturns=None):
         while True:
             if tsEnd >= tsStart:
                 # Establish 1,3,6,12 month timestamps in the past from indexDate
@@ -145,10 +145,10 @@ class Processor:
                 tsIndexDateOneYear = tsStart - BMonthEnd(12)
 
                 # Create dfs of price data for each timeframe to be used for return data
-                dfETFPriceDataOneMonth = dfClosingPrice.loc[tsIndexDateOneMonth:tsStart]
-                dfETFPriceDataThreeMonth = dfClosingPrice.loc[tsIndexDateThreeMonth:tsStart]
-                dfETFPriceDataSixMonth = dfClosingPrice.loc[tsIndexDateSixMonth:tsStart]
-                dfETFPriceDataOneYear = dfClosingPrice.loc[tsIndexDateOneYear:tsStart]
+                dfETFPriceDataOneMonth = dfAdjClosingPrice.loc[tsIndexDateOneMonth:tsStart]
+                dfETFPriceDataThreeMonth = dfAdjClosingPrice.loc[tsIndexDateThreeMonth:tsStart]
+                dfETFPriceDataSixMonth = dfAdjClosingPrice.loc[tsIndexDateSixMonth:tsStart]
+                dfETFPriceDataOneYear = dfAdjClosingPrice.loc[tsIndexDateOneYear:tsStart]
 
                 # Get df of 1,3,6,12 month returns
                 dfETFOneMonthTotalReturn = Processor.total_returns(dfETFPriceDataOneMonth)
