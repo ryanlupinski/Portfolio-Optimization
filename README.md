@@ -62,12 +62,15 @@ lets look at how the tool performs these steps.
 The tool follows Faber's strategy by creating timeframes for calculating returns of each ETF. These variables store start and end dates that are used as parameters for calculating returns and  200 day moving averages.
 Investment returns are calculated by finding the change in price from the last business day of each month, ie the total 1-month return from 4/29/22 (the last trading day in April 2022) is calculated from 3/31/22 (the last trading day in March).
 Once the last trading day to be used by the tool is found, BMonthEnd() subtracts the appropriate number of months and creates our time frame values as time stamps.
+
 ```python
 # Define time frames
-today = dt.date.today()
+today = dt.date.tsToday()
 lastTradingDayOfMonth = Processor.last_trading_day()
 
------ processing.py ------------
+----- processing.py - -----------
+
+
 class Processor:
     @staticmethod
     def last_trading_day():
@@ -84,7 +87,9 @@ class Processor:
             lastTradingDayOfMonth = today + BMonthEnd(0)
 
         return lastTradingDayOfMonth
------ processing.py ------------
+
+
+----- processing.py - -----------
 
 oneMonth = lastTradingDayOfMonth - BMonthEnd(1)
 threeMonths = lastTradingDayOfMonth - BMonthEnd(3)
@@ -201,7 +206,7 @@ These CSVs are copied into the spreadsheet and the functions within tabulate the
 that to the buy and hold portion.
 ```python
 # Create csvs for closing price data, 200 day simple moving average data, and returns data
-path = os.getcwd() + "/CSVs"
+path = os.getcwd() + "/Dataframes"
 dfETFPriceDataOneYear.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
 dfETF200DayMovingAverageLatest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
 dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
