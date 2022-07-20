@@ -226,6 +226,7 @@ if tsLastTradingDay > tsLatestClosingPriceData:
     tsLatestClosingPriceData = dfClosingPriceDataTenYears.index[-1]  # reset tsLatestClosingPriceData
 else:
     print("dfClosingPriceDataTenYears is up to date")
+# --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
 """SECTION FOR NEW ADJUSTED CLOSING PRICE DATA NOT CURRENTLY IN DATAFRAME"""
@@ -295,7 +296,33 @@ else:
     print("dictOfETFReturnsDataframes is up to date")
 # --------------------------------------------------------------------------- #
 
-# !!! SECTION FOR CREATING CSVS FOR SPREADSHEET !!!
+# CSVs for Portfolio Optimization Tool.xlsx --------------------------------- #
+""" 
+The following CSVs are created in this section
+1. Portfolio Last Trading Day Closing Price Data.csv
+2. Portfolio Last Trading Day 200D SMA.csv
+3. Portfolio Latest Returns.csv
+
+The CSVs must be manually loaded into Portfolio Optimization Tool.xlsx in the
+appropriate sheet. Future version of this tool will automatically load the CSV
+data into the appropriate sheet/section. Issues involving the loss of charts in the
+spreadsheet currently prevent this from being automated.
+"""
+
+# --------------------------------------------------------------------------- #
+"""CLOSING PRICE DATA FOR LAST TRADING DAY"""
+path = os.getcwd() + "/Data/Spreadsheet CSVs"
+dfClosingPriceDataTenYears.tail(1).to_csv(os.path.join(path, r'Portfolio Last Trading Day Closing Price Data.csv'))
+# --------------------------------------------------------------------------- #
+
+# --------------------------------------------------------------------------- #
+"""200 DAY SIMPLE MOVING AVERAGE PRICE DATA FOR LAST TRADING DAY"""
+path = os.getcwd() + "/Data/Spreadsheet CSVs"
+df200DSMATenYears.tail(1).to_csv(os.path.join(path, r'Portfolio Last Trading Day 200D SMA.csv'))
+# --------------------------------------------------------------------------- #
+
+# --------------------------------------------------------------------------- #
+"""RETURNS DATA FOR 1, 3, 6, 12 MONTHS FROM LAST TRADING DAT"""
 tsIndexDateOneMonth = tsLastTradingDay - BMonthEnd(1)
 tsIndexDateThreeMonth = tsLastTradingDay - BMonthEnd(3)
 tsIndexDateSixMonth = tsLastTradingDay - BMonthEnd(6)
@@ -306,11 +333,6 @@ dfETFPriceDataOneMonth = dfAdjClosingPriceDataTenYears.loc[tsIndexDateOneMonth:t
 dfETFPriceDataThreeMonth = dfAdjClosingPriceDataTenYears.loc[tsIndexDateThreeMonth:tsLastTradingDay]
 dfETFPriceDataSixMonth = dfAdjClosingPriceDataTenYears.loc[tsIndexDateSixMonth:tsLastTradingDay]
 dfETFPriceDataOneYear = dfAdjClosingPriceDataTenYears.loc[tsIndexDateOneYear:tsLastTradingDay]
-
-# Create dataframes of 200 day simple moving average for all ETFs in portfolio
-dfETF200DayMovingAverage = Processor.moving_average(etfs=lstETFs, start_date=tsIndexDateOneYear,
-                                                    end_date=tsLastTradingDay, OHLCVAC='Close', window=200)
-dfETF200DayMovingAverageLatest = dfETF200DayMovingAverage.tail(1)
 
 # Calculate 1m, 3m, 6m, & 1y returns for all ETFs in portfolio
 dfETFOneMonthTotalReturn = Processor.total_returns(dfETFPriceDataOneMonth)
@@ -328,43 +350,8 @@ lstOfTotalReturns = [
 dfTotalReturns = pd.concat(lstOfTotalReturns)
 dfTotalReturns = dfTotalReturns.assign(Returns=['1 month', '3 month', '6 month', '1 year'])
 
-# Create csvs for closing price data, 200 day simple moving average data, and returns data
 path = os.getcwd() + "/Data/Spreadsheet CSVs"
-dfETFPriceDataOneYear.to_csv(os.path.join(path, r'Portfolio 1 Year Closing Price Data.csv'))
-dfETF200DayMovingAverageLatest.to_csv(os.path.join(path, r'Portfolio Latest 200D SMA.csv'))
-dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Returns.csv'))
+dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Latest Returns.csv'))
+# --------------------------------------------------------------------------- #
 
 print("CSVs created! Add each csv to the appropriate sheet in Portfolio Optimization Tool.xlsx")
-
-# !!! SECTION FOR CREATING PORTFOLIO OBJECT AND BACKTEST !!!
-# dict of ETF buy and hold percentages for 1st 50% of portfolio
-dictPortfolioBuyAndHold = {
-    'MTUM': 0.05,
-    'VTV': 0.05,
-    'VEU': 0.0675,
-    'VWO': 0.0225,
-    'VCIT': 0.089,
-    'VGLT': 0.0675,
-    'BNDX': 0.072,
-    'VTIP': 0.009,
-    'DBC': 0.025,
-    'IAU': 0.025,
-    'VNQ': 0.0225
-}
-# Instantiate the portfolio w/ $10k
-portfolio = Portfolio(etfs=lstETFs, portfolioValue=10000)
-
-for etf in lstETFs:
-    # Find the $ amount for each ETF for the 50% buy and hold portion
-    fltETFDollarAmount = dictPortfolioBuyAndHold[etf] * portfolio.portfolioValue
-    # Get opening price for each ETF on the tsIndexPointer date
-    fltETFOpeningPrice = Processor.price_data(etfs=etf,
-                                              start_date=tsIndexPointer,
-                                              end_date=tsIndexPointer,
-                                              OHLCVAC='Open')[0]
-    intETFShares = int(np.floor(fltETFDollarAmount / fltETFOpeningPrice))
-    fltETFBuyAmount = float(fltETFOpeningPrice * intETFShares)
-    portfolio.setPortfolioCash(cash_delta=fltETFBuyAmount)
-    print(intETFShares)
-
-input("hold:")
