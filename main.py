@@ -11,7 +11,6 @@ as described here: https://www.cambriainvestments.com/wp-content/uploads/2016/07
 if __name__ == "__main__":
     import os
     import pandas as pd
-    import numpy as np
     from portfolio import Portfolio
     from processing import Processor
     from pandas.tseries.offsets import BMonthEnd, BDay
