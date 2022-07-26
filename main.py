@@ -233,7 +233,8 @@ else:
 tsLatestAdjClosingPriceData = dfAdjClosingPriceDataTenYears.index[-1]
 
 if tsLastTradingDay > tsLatestAdjClosingPriceData:
-    tsLatestAdjClosingPriceData += BDay(1)  # advance tsLatestAdjClosingPriceData to next business day so no index overlap
+    tsLatestAdjClosingPriceData += BDay(
+        1)  # advance tsLatestAdjClosingPriceData to next business day so no index overlap
     dfNewAdjClosingPriceData = Processor.price_data(etfs=lstETFs,
                                                     start_date=tsLatestAdjClosingPriceData,
                                                     end_date=tsLastTradingDay,
@@ -354,3 +355,134 @@ dfTotalReturns.to_csv(os.path.join(path, r'Portfolio Latest Returns.csv'))
 # --------------------------------------------------------------------------- #
 
 print("CSVs created! Add each csv to the appropriate sheet in Portfolio Optimization Tool.xlsx")
+
+# --------------------------------------------------------------------------- #
+# Portfolio object and backtester ------------------------------------------- #
+"""
+This section will create a portfolio object from the Portfolio class.
+The portfolio object has 1 attribute, a dataframe, show below.
+******************************************************************************************************************
+self.__portfolioAssets : DataFrame =
+    Date                Cash       ETF1_shares     ETF1_close   ETFn_shares     ETFn_close      Portfolio Value
+    YYYY-MM-DD          float      int             float        int             float           float
+******************************************************************************************************************
+The portfolio object is instantiated with a list of etfs, a portfolio value, and a start date. The backtester will
+loop through index dates and add rows of data by buying and selling shares at the open, updating closing prices,
+and calculating the Portfolio Value by adding cash + sum(etf shares * etf prices). The start date is rolled back 
+1 business day when instantiated to simulate a 'fully funded portfolio' ready to buy shares on the proceeding day.
+The tool will start at tsIndexPointer and add rows of closing price data for each business day, buy and sell
+shares at the open on the first business day of the month, and calculate the Portfolio Value on each close until
+tsIndexPointer is incremented to tsLastTradingDay. The script will save the dataframe of portfolioAssets so that
+it can be reloaded, and any new data from trading days not yet saved can be added to the dataframe.
+"""
+# --------------------------------------------------------------------------- #
+try:
+    # try and load data
+    path = os.getcwd() + "/Data/Portfolio Data"
+    optimizedPortfolioDataframe = pd.read_csv(os.path.join(path, r'optimizedPortfolio.csv'),
+                                              index_col='Date',
+                                              parse_dates=True)
+    tsOptimizedPortfolioLastDate = optimizedPortfolioDataframe.index[-1]
+    optimizedPortfolio = Portfolio(etfs=lstETFs,
+                                   portfolioValue=10000,
+                                   startDate=tsOptimizedPortfolioLastDate,
+                                   data=optimizedPortfolioDataframe)
+except:
+    # Instantiate optimizedPortfolio with $10,000 on tsIndexPointer date
+    optimizedPortfolioDataframe = None
+    optimizedPortfolio = Portfolio(etfs=lstETFs,
+                                   portfolioValue=10000,
+                                   startDate=tsIndexPointer,
+                                   data=optimizedPortfolioDataframe)
+
+while True:
+    dictBuyAndHoldPercentages = {
+        'MTUM': 0.05,
+        'VTV': 0.05,
+        'VEU': 0.0675,
+        'VWO': 0.0225,
+        'VCIT': 0.089,
+        'VGLT': 0.0675,
+        'BNDX': 0.072,
+        'VTIP': 0.009,
+        'DBC': 0.025,
+        'IAU': 0.025,
+        'VNQ': 0.0225
+    }
+    # if the last index in the portfolioAssets dataframe is earlier than
+    # the last trading day enter first loop
+    if tsLastTradingDay > optimizedPortfolio.get_last_index():
+        # set tsIndexPointer to optimizedPortfolio.portfolioAssets.index[-1]
+        tsIndexPointer = optimizedPortfolio.get_last_index()
+        tsNextDay = tsIndexPointer + BDay(1)
+        if tsNextDay.day == 4 and tsNextDay.month == 7:
+            tsNextDay += BDay(1)
+        # add new row of data from previous day
+        dictNextDay = {'Date': [tsNextDay],
+                       'Cash': [optimizedPortfolio.portfolioAssets.at[tsIndexPointer, 'Cash']]}
+        for i in lstETFs:
+            dictNextDay.update({f'{i}_shares': optimizedPortfolio.portfolioAssets.at[tsIndexPointer, f'{i}_shares']})
+            dictNextDay.update({f'{i}_close': optimizedPortfolio.portfolioAssets.at[tsIndexPointer, f'{i}_close']})
+        dictNextDay.update({'Portfolio Value': optimizedPortfolio.portfolioAssets.at[tsIndexPointer,'Portfolio Value']})
+        dfNextDay = pd.DataFrame(data=dictNextDay).set_index('Date')
+        optimizedPortfolio.add_row_to_dataframe(dfNextDay)
+
+        # check to see if tsIndexPointer is end of month
+        if tsIndexPointer.is_month_end:
+            # check each ETF's rank and close vs. 200D SMA
+            for etf in lstETFs:
+                # if etf is top 5 rank, and closing price above 200D SMA add 10% to dictBuyAndHoldPercentages
+                if dictOfETFReturnsDataframes[f'df{etf}'].at[tsIndexPointer, f'{etf}_rank'] < 6 and \
+                        dfClosingPriceDataTenYears.at[tsIndexPointer, f'{etf}'] > \
+                        df200DSMATenYears.at[tsIndexPointer, f'{etf}']:
+                    dictBuyAndHoldPercentages[f'{etf}'] += 0.1
+            for etf in lstETFs:
+                # check how many shares the portfolio already has
+                intCurrentShares = optimizedPortfolio.portfolioAssets.at[tsNextDay, f'{etf}_shares']
+                # calculate dollar amount of each ETF to buy based on dictBuyAndHoldPercentages
+                intNewETFDollarAmount = (optimizedPortfolio.portfolioAssets.at[tsNextDay, f'Portfolio Value'] *
+                                         dictBuyAndHoldPercentages[f'{etf}'])
+                # calculate the number of shares to buy rounded down
+                intNewShares = int(intNewETFDollarAmount / dfOpeningPriceDataTenYears.at[tsNextDay, f'{etf}'])
+                # calculate shares delta
+                intSharesDelta = intCurrentShares - intNewShares
+                # if the current shares owned is less than the new shares, buy shares
+                if intSharesDelta != 0:
+                    if intCurrentShares < intNewShares:
+                        # buy dollar amount at open
+                        intBuyShares = abs(intSharesDelta)
+                        fltETFOpenBuy = dfOpeningPriceDataTenYears.at[tsNextDay, f'{etf}'] * intBuyShares
+                        optimizedPortfolio.buy_shares_at_open(date=tsNextDay,
+                                                              etf=etf,
+                                                              shares=intBuyShares,
+                                                              cost=fltETFOpenBuy)
+
+                    else:
+                        # sell dollar amount at open
+                        intSellShares = abs(intSharesDelta)
+                        fltETFOpenSell = dfOpeningPriceDataTenYears.at[tsNextDay, f'{etf}'] * intSellShares
+                        optimizedPortfolio.sell_shares_at_open(date=tsNextDay,
+                                                               etf=etf,
+                                                               shares=intSellShares,
+                                                               cost=fltETFOpenSell)
+                # update closing price for each etf
+                optimizedPortfolio.update_closing_price(date=tsNextDay,
+                                                        etf=etf,
+                                                        price=dfClosingPriceDataTenYears.at[tsNextDay, f'{etf}'])
+            # update the portfolio value
+            optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
+        else:
+            for etf in lstETFs:
+                # update closing price for each etf
+                optimizedPortfolio.update_closing_price(date=tsNextDay,
+                                                        etf=etf,
+                                                        price=dfClosingPriceDataTenYears.at[tsNextDay, f'{etf}'])
+            # update the portfolio value
+            optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
+    else:
+        break
+
+path = os.getcwd() + "/Data/Portfolio Data"
+optimizedPortfolio.portfolioAssets.to_csv(os.path.join(path, r'optimizedPortfolio.csv'))
+
+print("")

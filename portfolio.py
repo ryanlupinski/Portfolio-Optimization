@@ -1,149 +1,74 @@
+import os # remove this
+import pandas as pd
+from pandas.tseries.offsets import BDay
+
+
 class Portfolio:
     """
-    Portfolio Object
-    portfolio = {
-    'Cash': int
-    'etf ticker 1': {'rank': int, 'closing price': %.2f, 'opening price': %.2f, '200D MA': %.2f, 'shares': int},
-    'etf ticker n': {'rank': int, 'closing price': %.2f, 'opening price': %.2f, '200D MA': %.2f, 'shares': int},
-    }
+    Portfolio Object - An object that contains a dataframe of cash,
+    shares of ETFs, their closing price, and portfolio value, indexed by date
+
+    self.__portfolioAssets : DataFrame =
+        Date                Cash       ETF1_shares     ETF1_close   ETFn_shares     ETFn_close      Portfolio Value
+        YYYY-MM-DD          float      int             float        int             float           float
     """
 
     # -- Constructor --
-    def __init__(self, etfs, portfolioValue):
+    def __init__(self, etfs, portfolioValue, startDate, data=None):
         # -- Attributes --
-        self.__portfolioValue = portfolioValue  # Protected attribute of portfolio value
-        self.__portfolioAssets = {'Cash': portfolioValue}  # Initialize portfolio w/ cash
-        for i in etfs:  # Initialize portfolio attribute w/ nested dictionary
-            self.__portfolioAssets.update({i: {'Rank': int(0),
-                                               'Closing price': float(0.00),
-                                               'Opening price': float(0.00),
-                                               '200D MA': float(0.00),
-                                               'Shares': int(0)}})
-        print(f"Portfolio instantiated with ${portfolioValue:.2f}\n")
+        if data is None:
+            # startDate -= BDay(1)  # roll back start date 1 day to initialize dataframe
+            d = {'Date': [startDate],
+                 'Cash': [(float(portfolioValue))]}
+            for i in etfs:
+                d.update({f'{i}_shares': int(0)})
+                d.update({f'{i}_close': float(0.00)})
+            d.update({'Portfolio Value': float(portfolioValue)})
+            self.__portfolioAssets = pd.DataFrame(data=d).set_index('Date')
+            print(f"Portfolio instantiated with ${portfolioValue:.2f}\n")
+        else:
+            d = data
+            self.__portfolioAssets = pd.DataFrame(data=d)
+            print(f"Portfolio data loaded")
 
     # -- Properties --
     @property
-    def portfolioValue(self):
-        return self.__portfolioValue
-
-    @portfolioValue.getter
-    def portfolioValue(self):
-        """
-        :return: Returns float value of portfolio
-        """
-        for key, info in self.__portfolioAssets.items():
-            if key == 'Cash':
-                self.__portfolioValue = ([info][0])
-            else:
-                shares = info['Shares']
-                price = info['Closing price']
-                x = (shares * price)
-                self.__portfolioValue += x
-        return self.__portfolioValue
-
-    # -- Methods --
-    def reportPortfolioAllocation(self):
-        """
-        :return: row of key:value of dict info for each ETF
-        """
-        print("***********************************")
-        for key, info in self.__portfolioAssets.items():
-            if key == 'Cash':
-                print("\nCash: $", ([info][0]), sep="")
-            else:
-                print("\nETF:", key)
-                for i in info:
-                    print(i + ':', info[i])
-        print("***********************************\n")
-
-    def setPortfolioAsset(self,
-                          etf,
-                          rank=None,
-                          closing_price=None,
-                          opening_price=None,
-                          MA_200D=None,
-                          shares=None):
-        if rank is not None:
-            self.__portfolioAssets[etf]['Rank'] = rank
-        if closing_price is not None:
-            self.__portfolioAssets[etf]['Closing price'] = closing_price
-        if opening_price is not None:
-            self.__portfolioAssets[etf]['Opening price'] = opening_price
-        if MA_200D is not None:
-            self.__portfolioAssets[etf]['200D MA'] = MA_200D
-        if shares is not None:
-            self.__portfolioAssets[etf]['Shares'] = shares
+    def portfolioAssets(self):
         return self.__portfolioAssets
 
-    def getPortfolioAsset(self, etf, item):
-        getValue = self.__portfolioAssets[etf][item]
-        return getValue
-
-    def setPortfolioCash(self, cash_delta):
-        currentCashValue = self.__portfolioAssets.get('Cash')
-        setCashValue = currentCashValue - cash_delta
-        if setCashValue < 0.00:
-            print("Insufficient cash for transaction")
+    # -- Methods --
+    def buy_shares_at_open(self, date, etf, shares, cost):
+        if cost > self.__portfolioAssets.at[date, 'Cash']:
+            print('Insufficient funds')
         else:
-            self.__portfolioAssets['Cash'] = setCashValue
-        return
+            self.__portfolioAssets.at[date, f'{etf}_shares'] += shares
+            self.__portfolioAssets.at[date, 'Cash'] -= cost
 
-    def getPortfolioCash(self):
-        currentCashValue = self.__portfolioAssets.get('Cash')
-        return currentCashValue
+    def sell_shares_at_open(self, date, etf, shares, cost):
+        if shares > self.__portfolioAssets.at[date, f'{etf}_shares']:
+            print('Insufficient shares')
+        else:
+            self.__portfolioAssets.at[date, f'{etf}_shares'] = shares
+            self.__portfolioAssets.at[date, 'Cash'] += cost
 
+    def update_closing_price(self, date, etf, price):
+        self.__portfolioAssets.at[date, f'{etf}_close'] = price
 
-# # list of ETFs
-# lstETFs = [
-#     'MTUM',  # US Stocks Momentum
-#     'VTV',  # US Stocks Value
-#     'VEU',  # Foreign Developed Stock
-#     'VWO',  # Foreign Emerging Stocks
-#     'VCIT',  # Corporate Bonds
-#     'VGLT',  # 30Y Bonds
-#     'BNDX',  # 10Y Foreign BondsPo
-#     'VTIP',  # TIPS
-#     'DBC',  # Commodities
-#     'IAU',  # Gold
-#     'VNQ',  # REITS
-# ]
-#
-# # instantiate 2 portfolios
-# portfolio1 = Portfolio(lstETFs, 10000.00)
-# portfolio2 = Portfolio(lstETFs, 20000.00)
-#
-# # return portfolio value
-# print(f"Portfolio1 value: ${portfolio1.portfolioValue:.2f}")
-# print(f"Portfolio2 value: ${portfolio2.portfolioValue:.2f}")
-#
-# # return portfolio allocation as list of key:value pairs
-# portfolio1.reportPortfolioAllocation()
-# portfolio2.reportPortfolioAllocation()
-#
-# # get cash value
-# print(f"cash: $", portfolio1.getPortfolioCash(), sep="")
-# print(f"cash: $", portfolio2.getPortfolioCash(), sep="")
-#
-# # set cash value
-# portfolio1.setPortfolioCash(cash_delta=+1.00)
-# portfolio2.setPortfolioCash(cash_delta=-1.00)
-#
-# # get cash value
-# print(f"cash: $", portfolio1.getPortfolioCash(), sep="")
-# print(f"cash: $", portfolio2.getPortfolioCash(), sep="")
-#
-# # Set asset value
-# portfolio1.setPortfolioAsset(etf='VNQ', rank=1, shares=1, closing_price=100.12, MA_200D=101.45)
-# portfolio2.setPortfolioAsset(etf='VTV', rank=2, shares=4, closing_price=900.99, MA_200D=893.09)
-#
-# # get asset value
-# print(portfolio1.getPortfolioAsset(etf='VNQ', item='Closing price'))
-# print(portfolio2.getPortfolioAsset(etf='VTV', item='200D MA'))
-#
-# # return portfolio allocation as list of key:value pairs
-# portfolio1.reportPortfolioAllocation()
-# portfolio2.reportPortfolioAllocation()
-#
-# # return portfolio value
-# print(f"Portfolio1 value: ${portfolio1.portfolioValue:.2f}")
-# print(f"Portfolio2 value: ${portfolio2.portfolioValue:.2f}")
+    def portfolio_closing_value(self, date, etfs):
+        cash = self.__portfolioAssets.at[date, 'Cash']
+        self.__portfolioAssets.at[date, 'Portfolio Value'] = cash
+        for i in etfs:
+            shares = self.__portfolioAssets.at[date, f'{i}_shares']
+            price = self.__portfolioAssets.at[date, f'{i}_close']
+            etfValue = (shares * price)
+            self.__portfolioAssets.at[date, 'Portfolio Value'] += etfValue
+
+    def get_portfolio_closing_value(self, date):
+        return self.__portfolioAssets.at[date, 'Portfolio Value']
+
+    def add_row_to_dataframe(self, df):
+        self.__portfolioAssets = self.__portfolioAssets.append(df, verify_integrity=True)
+
+    def get_last_index(self):
+        return self.__portfolioAssets.index[-1]
+    # -- End of Class --
