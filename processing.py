@@ -198,3 +198,30 @@ class Processor:
             else:
                 break
         return dictOfReturns
+
+    @staticmethod
+    def dividends(tsStart, tsEnd):
+        """
+        only does predetermined list of etfs
+        :param tsStart: timestamp start date
+        :param tsEnd:  timestamp end date
+        :return: dict of dataframes of dividend data
+        """
+        dictDividends = {
+            'MTUM': None,
+            'VTV': None,
+            'VEU': None,
+            'VWO': None,
+            'VCIT': None,
+            'VGLT': None,
+            'BNDX': None,
+            'VTIP': None,
+            'DBC': None,
+            'IAU': None,
+            'VNQ': None
+        }
+        for key in dictDividends:
+            dictDividends[f'{key}'] = web.DataReader(f'{key}', 'yahoo-dividends', start=tsStart, end=tsEnd)
+            del dictDividends[f'{key}']['action']
+            dictDividends[f'{key}'].rename(columns={'value': 'Dividend'}, inplace=True)
+        return dictDividends

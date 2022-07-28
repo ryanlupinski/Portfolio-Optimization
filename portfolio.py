@@ -40,6 +40,8 @@ class Portfolio:
     def buy_shares_at_open(self, date, etf, shares, cost):
         if cost > self.__portfolioAssets.at[date, 'Cash']:
             print('Insufficient funds')
+            self.__portfolioAssets.at[date, f'{etf}_shares'] += shares
+            self.__portfolioAssets.at[date, 'Cash'] -= cost
         else:
             self.__portfolioAssets.at[date, f'{etf}_shares'] += shares
             self.__portfolioAssets.at[date, 'Cash'] -= cost
@@ -48,7 +50,7 @@ class Portfolio:
         if shares > self.__portfolioAssets.at[date, f'{etf}_shares']:
             print('Insufficient shares')
         else:
-            self.__portfolioAssets.at[date, f'{etf}_shares'] = shares
+            self.__portfolioAssets.at[date, f'{etf}_shares'] -= shares
             self.__portfolioAssets.at[date, 'Cash'] += cost
 
     def update_closing_price(self, date, etf, price):
