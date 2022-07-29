@@ -40,8 +40,10 @@ class Portfolio:
     def buy_shares_at_open(self, date, etf, shares, cost):
         if cost > self.__portfolioAssets.at[date, 'Cash']:
             print('Insufficient funds')
+            # EVENTUALLY REMOVE THIS WHEN SELL ORDERS ARE HANDLED FIRST -------------#
             self.__portfolioAssets.at[date, f'{etf}_shares'] += shares
             self.__portfolioAssets.at[date, 'Cash'] -= cost
+            # EVENTUALLY REMOVE THIS WHEN SELL ORDERS ARE HANDLED FIRST -------------#
         else:
             self.__portfolioAssets.at[date, f'{etf}_shares'] += shares
             self.__portfolioAssets.at[date, 'Cash'] -= cost

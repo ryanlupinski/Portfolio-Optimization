@@ -13,7 +13,7 @@ if __name__ == "__main__":
     import pandas as pd
     from portfolio import Portfolio
     from processing import Processor
-    from pandas.tseries.offsets import BMonthEnd, BDay, BusinessMonthEnd
+    from pandas.tseries.offsets import BMonthEnd, BDay
 else:
     raise Exception("This file was not created to be imported")
 # --------------------------------------------------------------------------- #
@@ -45,9 +45,9 @@ print(f"Last trading day: {tsLastTradingDay}")
 # Load or create dataframes of price data ----------------------------------- #
 # --------------------------------------------------------------------------- #
 """OPENING PRICE DATA"""
-# Check to see if opening price data csv exists in /Data/Dataframes
+# Check to see if opening price data csv exists in /Data/Dataframes/Price Data
 try:
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     # If it already exists, load data
     dfOpeningPriceDataTenYears = pd.read_csv(os.path.join(path, r'dfOpeningPriceDataTenYears.csv'),
                                              index_col='Date',
@@ -57,17 +57,17 @@ except:
     # Create dataframe of 10 years of opening price data
     dfOpeningPriceDataTenYears = Processor.price_data(etfs=lstETFs, start_date=tsTenYears,
                                                       end_date=tsLastTradingDay, OHLCVAC='Open')
-    # Save dataframe of 10 years of opening price date to /Data/Dataframes
-    path = os.getcwd() + "/Data/Dataframes"
+    # Save dataframe of 10 years of opening price date to /Data/Dataframes/Price Data
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfOpeningPriceDataTenYears.to_csv(os.path.join(path, r'dfOpeningPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
 """CLOSING PRICE DATA"""
-# Check to see if closing price data csv exists in /Data/Dataframes
+# Check to see if closing price data csv exists in /Data/Dataframes/Price Data
 try:
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     # If it already exists, load data
     dfClosingPriceDataTenYears = pd.read_csv(os.path.join(path, r'dfClosingPriceDataTenYears.csv'),
                                              index_col='Date',
@@ -77,17 +77,17 @@ except:
     # Create dataframe of 10 years of closing price data
     dfClosingPriceDataTenYears = Processor.price_data(etfs=lstETFs, start_date=tsTenYears,
                                                       end_date=tsLastTradingDay, OHLCVAC='Close')
-    # Save dataframe of 10 years of closing price date to /Data/Dataframes
-    path = os.getcwd() + "/Data/Dataframes"
+    # Save dataframe of 10 years of closing price date to /Data/Dataframes/Price Data
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfClosingPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
 """ADJUSTED CLOSE PRICE DATA"""
-# Check to see if adjusted closing price data csv exists in /Data/Dataframes
+# Check to see if adjusted closing price data csv exists in /Data/Dataframes/Price Data
 try:
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     # If it already exists, load data
     dfAdjClosingPriceDataTenYears = pd.read_csv(os.path.join(path, r'dfAdjClosingPriceDataTenYears.csv'),
                                                 index_col='Date',
@@ -97,17 +97,17 @@ except:
     # Create dataframe of 10 years of adjusted closing price data
     dfAdjClosingPriceDataTenYears = Processor.price_data(etfs=lstETFs, start_date=tsTenYears,
                                                          end_date=tsLastTradingDay, OHLCVAC='Adj Close')
-    # Save dataframe of 10 years of adjusted closing price date to /Data/Dataframes
-    path = os.getcwd() + "/Data/Dataframes"
+    # Save dataframe of 10 years of adjusted closing price date to /Data/Dataframes/Price Data
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfAdjClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfAdjClosingPriceDataTenYears.csv'), na_rep='nan',
                                          date_format='%Y-%m-%d %H:%M:%S')
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
 """2OO DAY SIMPLE MOVING AVERAGE PRICE DATA"""
-# Check to see if 200D SMA data csv exists in /Data/Dataframes
+# Check to see if 200D SMA data csv exists in /Data/Dataframes/Price Data
 try:
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     # If it already exists, load data
     df200DSMATenYears = pd.read_csv(os.path.join(path, r'df200DSMATenYears.csv'),
                                     index_col='Date',
@@ -117,8 +117,8 @@ except:
     # Create dataframe of 10 years of 200D SMA data
     df200DSMATenYears = Processor.moving_average(etfs=lstETFs, start_date=tsTenYears, end_date=tsLastTradingDay,
                                                  OHLCVAC='Close', window=200)
-    # Save dataframe of 10 years of 200D SMA data to /Data/Dataframes
-    path = os.getcwd() + "/Data/Dataframes"
+    # Save dataframe of 10 years of 200D SMA data to /Data/Dataframes/Price Data
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     df200DSMATenYears.to_csv(os.path.join(path, r'df200DSMATenYears.csv'), na_rep='nan',
                              date_format='%Y-%m-%d %H:%M:%S')
 # --------------------------------------------------------------------------- #
@@ -198,7 +198,7 @@ if tsLastTradingDay > tsLatestOpeningPriceData:
                                                  OHLCVAC='Open')
     dfOpeningPriceDataTenYears = dfOpeningPriceDataTenYears.append(dfNewOpeningPriceData,
                                                                    verify_integrity=True)
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfOpeningPriceDataTenYears.to_csv(os.path.join(path, r'dfOpeningPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
     tsLatestOpeningPriceData = dfOpeningPriceDataTenYears.index[-1]  # reset tsLatestOpeningPriceData
@@ -219,7 +219,7 @@ if tsLastTradingDay > tsLatestClosingPriceData:
                                                  OHLCVAC='Close')
     dfClosingPriceDataTenYears = dfClosingPriceDataTenYears.append(dfNewClosingPriceData,
                                                                    verify_integrity=True)
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfClosingPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
     tsLatestClosingPriceData = dfClosingPriceDataTenYears.index[-1]  # reset tsLatestClosingPriceData
@@ -233,15 +233,15 @@ else:
 tsLatestAdjClosingPriceData = dfAdjClosingPriceDataTenYears.index[-1]
 
 if tsLastTradingDay > tsLatestAdjClosingPriceData:
-    tsLatestAdjClosingPriceData += BDay(
-        1)  # advance tsLatestAdjClosingPriceData to next business day so no index overlap
+    # advance tsLatestAdjClosingPriceData to next business day so no index overlap
+    tsLatestAdjClosingPriceData += BDay(1)
     dfNewAdjClosingPriceData = Processor.price_data(etfs=lstETFs,
                                                     start_date=tsLatestAdjClosingPriceData,
                                                     end_date=tsLastTradingDay,
                                                     OHLCVAC='Adj Close')
     dfAdjClosingPriceDataTenYears = dfAdjClosingPriceDataTenYears.append(dfNewAdjClosingPriceData,
                                                                          verify_integrity=True)
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfAdjClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfAdjClosingPriceDataTenYears.csv'), na_rep='nan',
                                          date_format='%Y-%m-%d %H:%M:%S')
     tsLatestAdjClosingPriceData = dfAdjClosingPriceDataTenYears.index[-1]  # reset tsLatestAdjClosingPriceData
@@ -264,7 +264,7 @@ if tsLastTradingDay > tsLatest200DSMAData:
                                                     window=200)
     dfNew200DSMATenYears = dfNew200DSMATenYears.loc[tsLatest200DSMAData:]  # splice only new index dates to append
     df200DSMATenYears = df200DSMATenYears.append(dfNew200DSMATenYears, verify_integrity=True)
-    path = os.getcwd() + "/Data/Dataframes"
+    path = os.getcwd() + "/Data/Dataframes/Price Data"
     df200DSMATenYears.to_csv(os.path.join(path, r'df200DSMATenYears.csv'), na_rep='nan',
                              date_format='%Y-%m-%d %H:%M:%S')
     tsLatest200DSMAData = df200DSMATenYears.index[-1]  # reset tsLatest200DSMAData
@@ -360,7 +360,7 @@ print("CSVs created! Add each csv to the appropriate sheet in Portfolio Optimiza
 # Portfolio object and backtester ------------------------------------------- #
 """
 This section will create a portfolio object from the Portfolio class.
-The portfolio object has 1 attribute, a dataframe, show below.
+The portfolio object has 1 attribute, a dataframe, shown below.
 ******************************************************************************************************************
 self.__portfolioAssets : DataFrame =
     Date                Cash       ETF1_shares     ETF1_close   ETFn_shares     ETFn_close      Portfolio Value
@@ -368,12 +368,11 @@ self.__portfolioAssets : DataFrame =
 ******************************************************************************************************************
 The portfolio object is instantiated with a list of etfs, a portfolio value, and a start date. The backtester will
 loop through index dates and add rows of data by buying and selling shares at the open, updating closing prices,
-and calculating the Portfolio Value by adding cash + sum(etf shares * etf prices). The start date is rolled back 
-1 business day when instantiated to simulate a 'fully funded portfolio' ready to buy shares on the proceeding day.
-The tool will start at tsIndexPointer and add rows of closing price data for each business day, buy and sell
-shares at the open on the first business day of the month, and calculate the Portfolio Value on each close until
-tsIndexPointer is incremented to tsLastTradingDay. The script will save the dataframe of portfolioAssets so that
-it can be reloaded, and any new data from trading days not yet saved can be added to the dataframe.
+and calculating the Portfolio Value by adding cash + sum(etf shares * etf prices). The tool will start at 
+tsIndexPointer and add rows of closing price data for each business day, buy and sell shares at the open on the 
+first business day of the month, and calculate the Portfolio Value on each close until tsIndexPointer is 
+incremented to tsLastTradingDay. The script will save the dataframe of portfolioAssets so that it can be reloaded, 
+and any new data from trading days not yet saved can be added to the dataframe.
 """
 # --------------------------------------------------------------------------- #
 try:
@@ -387,9 +386,10 @@ try:
                                    portfolioValue=10000.00,
                                    startDate=tsOptimizedPortfolioLastDate,
                                    data=optimizedPortfolioDataframe)
-    dictOfETFDividends = pd.read_csv(os.path.join(path, r'optimizedPortfolio_dividends.csv'),
-                                     index_col='Date',
-                                     parse_dates=True)
+    # check if optimizedPortfolio dataframe is up to date
+    # if not, update it
+    # save it
+
 except:
     # Instantiate optimizedPortfolio with $10,000 on tsIndexPointer date
     optimizedPortfolioDataframe = None
@@ -397,10 +397,24 @@ except:
                                    portfolioValue=10000.00,
                                    startDate=tsIndexPointer,
                                    data=optimizedPortfolioDataframe)
+    # save it
+
+# --------------------------------------------------------------------------- #
+
+# --------------------------------------------------------------------------- #
+try:
+    path = os.getcwd() + "/Data/Portfolio Data/Dividends"
+    dictOfETFDividends = pd.read_csv(os.path.join(path, r'optimizedPortfolio_dividends.csv'),
+                                     index_col='Date',
+                                     parse_dates=True)
+except:
     # create dictOfETFDividends
     dictOfETFDividends = Processor.dividends(tsStart=tsIndexPointer,
                                              tsEnd=tsLastTradingDay)
-    dictOfETFDividends.to_csv(os.path.join(path, r'optimizedPortfolio_dividends.csv'))
+    path = os.getcwd() + "/Data/Portfolio Data/Dividends"
+    for etf in dictOfETFReturnsDataframes:
+        dictOfETFReturnsDataframes[etf].to_csv(os.path.join(path, str(etf) + '.csv'),
+                                               na_rep='nan', date_format='%Y-%m-%d %H:%M:%S')
 
 while True:
     # if the last index in the portfolioAssets dataframe is earlier than
@@ -446,19 +460,6 @@ while True:
                 'IAU': 0.025,
                 'VNQ': 0.0225
             }
-            # dictBuyAndHoldPercentages = {
-            #     'MTUM': 0.0,
-            #     'VTV': 0.0,
-            #     'VEU': 0.0,
-            #     'VWO': 0.0,
-            #     'VCIT': 0.0,
-            #     'VGLT': 0.0,
-            #     'BNDX': 0.0,
-            #     'VTIP': 0.0,
-            #     'DBC': 0.0,
-            #     'IAU': 0.0,
-            #     'VNQ': 0.0
-            # }
 
             # check each ETF's rank and close vs. 200D SMA
             for etf in lstETFs:
@@ -510,7 +511,7 @@ while True:
                     optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += fltCashDividend
 
             # add $50 to account at end of month
-            optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 50.00
+            optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
 
             # update the portfolio value
             optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
