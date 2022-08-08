@@ -464,19 +464,6 @@ while True:
             # add $100 to account at end of month
             optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
             optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
-            # dictBuyAndHoldPercentages = {
-            #     'MTUM': 0.00,
-            #     'VTV': 0.00,
-            #     'VEU': 0.00,
-            #     'VWO': 0.00,
-            #     'VCIT': 0.00,
-            #     'VGLT': 0.00,
-            #     'BNDX': 0.00,
-            #     'VTIP': 0.00,
-            #     'DBC': 0.00,
-            #     'IAU': 0.00,
-            #     'VNQ': 0.00
-            # }
             dictBuyAndHoldPercentages = {
                 'MTUM':  0.05,
                 'VTV': 0.05,
@@ -572,5 +559,4 @@ path = os.getcwd() + "/Data/Portfolio Data"
 optimizedPortfolioDataframe = optimizedPortfolio.portfolioAssets
 optimizedPortfolioDataframe.to_csv(os.path.join(path, r'optimizedPortfolio.csv'), na_rep='nan',
                                    date_format='%Y-%m-%d %H:%M:%S')
-
-print("")
+input("press any key to end")
