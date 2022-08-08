@@ -208,20 +208,21 @@ class Processor:
         :return: dict of dataframes of dividend data
         """
         dictDividends = {
-            'MTUM': None,
-            'VTV': None,
-            'VEU': None,
-            'VWO': None,
-            'VCIT': None,
-            'VGLT': None,
-            'BNDX': None,
-            'VTIP': None,
-            'DBC': None,
-            'IAU': None,
-            'VNQ': None
+            'MTUM': pd.DataFrame(),
+            'VTV': pd.DataFrame(),
+            'VEU': pd.DataFrame(),
+            'VWO': pd.DataFrame(),
+            'VCIT': pd.DataFrame(),
+            'VGLT': pd.DataFrame(),
+            'BNDX': pd.DataFrame(),
+            'VTIP': pd.DataFrame(),
+            'DBC': pd.DataFrame(),
+            'IAU': pd.DataFrame(),
+            'VNQ': pd.DataFrame()
         }
         for key in dictDividends:
             dictDividends[f'{key}'] = web.DataReader(f'{key}', 'yahoo-dividends', start=tsStart, end=tsEnd)
             del dictDividends[f'{key}']['action']
             dictDividends[f'{key}'].rename(columns={'value': 'Dividend'}, inplace=True)
+            dictDividends[f'{key}'].index.name = 'Date'
         return dictDividends

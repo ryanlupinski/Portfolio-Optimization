@@ -304,7 +304,7 @@ The following CSVs are created in this section
 3. Portfolio Latest Returns.csv
 
 The CSVs must be manually loaded into Portfolio Optimization Tool.xlsx in the
-appropriate sheet. Future version of this tool will automatically load the CSV
+appropriate sheet. Future versions of this tool will automatically load the CSV
 data into the appropriate sheet/section. Issues involving the loss of charts in the
 spreadsheet currently prevent this from being automated.
 """
@@ -375,46 +375,60 @@ incremented to tsLastTradingDay. The script will save the dataframe of portfolio
 and any new data from trading days not yet saved can be added to the dataframe.
 """
 # --------------------------------------------------------------------------- #
+"""PORTFOLIO DATAFRAME"""
+# Check to see if portfolio assets csv exists in /Data/Portfolio Data
 try:
-    # try and load data (portfolio dataframe + a dict of dataframes of dividend data)
     path = os.getcwd() + "/Data/Portfolio Data"
     optimizedPortfolioDataframe = pd.read_csv(os.path.join(path, r'optimizedPortfolio.csv'),
                                               index_col='Date',
                                               parse_dates=True)
+    # Find latest date of portfolio assets dataframe
     tsOptimizedPortfolioLastDate = optimizedPortfolioDataframe.index[-1]
+    # create optimizedPortfolio object
     optimizedPortfolio = Portfolio(etfs=lstETFs,
                                    portfolioValue=10000.00,
                                    startDate=tsOptimizedPortfolioLastDate,
                                    data=optimizedPortfolioDataframe)
-    # check if optimizedPortfolio dataframe is up to date
-    # if not, update it
-    # save it
+    # check to see if portfolio assets csv is up to date
 
 except:
+    print('Creating optimized portfolio object')
     # Instantiate optimizedPortfolio with $10,000 on tsIndexPointer date
     optimizedPortfolioDataframe = None
     optimizedPortfolio = Portfolio(etfs=lstETFs,
                                    portfolioValue=10000.00,
                                    startDate=tsIndexPointer,
                                    data=optimizedPortfolioDataframe)
-    # save it
+    # save optimizedPortfolio to /Data/Portfolio Data
+    path = os.getcwd() + "/Data/Portfolio Data"
+    optimizedPortfolioDataframe = optimizedPortfolio.portfolioAssets
+    optimizedPortfolioDataframe.to_csv(os.path.join(path, r'optimizedPortfolio.csv'), na_rep='nan',
+                                       date_format='%Y-%m-%d %H:%M:%S')
 
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
+"""PORTFOLIO DIVIDENDS"""
+# Check to see if ETF dividends data exists in /Data/Portfolio Data/Dividends
 try:
     path = os.getcwd() + "/Data/Portfolio Data/Dividends"
-    dictOfETFDividends = pd.read_csv(os.path.join(path, r'optimizedPortfolio_dividends.csv'),
-                                     index_col='Date',
-                                     parse_dates=True)
+    dictOfETFDividends = {}
+    for etf in lstETFs:
+        x = str("".join(['df', etf, '_div']))
+        df = pd.read_csv(os.path.join(path, f'df{etf}_dividends.csv'),
+                         index_col='Date',
+                         parse_dates=True)
+        dictOfETFDividends.update({x: df})
 except:
     # create dictOfETFDividends
     dictOfETFDividends = Processor.dividends(tsStart=tsIndexPointer,
                                              tsEnd=tsLastTradingDay)
     path = os.getcwd() + "/Data/Portfolio Data/Dividends"
-    for etf in dictOfETFReturnsDataframes:
-        dictOfETFReturnsDataframes[etf].to_csv(os.path.join(path, str(etf) + '.csv'),
-                                               na_rep='nan', date_format='%Y-%m-%d %H:%M:%S')
+    for etf in dictOfETFDividends:
+        dictOfETFDividends[etf].to_csv(os.path.join(path, str('df') + str(etf) + '_dividends.csv'),
+                                       na_rep='nan', date_format='%Y-%m-%d %H:%M:%S')
+
+# --------------------------------------------------------------------------- #
 
 while True:
     # if the last index in the portfolioAssets dataframe is earlier than
@@ -447,6 +461,22 @@ while True:
         # check to see if tsIndexPointer is end of month
         tsBMonthEndCheck = tsIndexPointer + BMonthEnd(0)
         if tsIndexPointer == tsBMonthEndCheck:
+            # add $100 to account at end of month
+            optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
+            optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
+            # dictBuyAndHoldPercentages = {
+            #     'MTUM': 0.00,
+            #     'VTV': 0.00,
+            #     'VEU': 0.00,
+            #     'VWO': 0.00,
+            #     'VCIT': 0.00,
+            #     'VGLT': 0.00,
+            #     'BNDX': 0.00,
+            #     'VTIP': 0.00,
+            #     'DBC': 0.00,
+            #     'IAU': 0.00,
+            #     'VNQ': 0.00
+            # }
             dictBuyAndHoldPercentages = {
                 'MTUM':  0.05,
                 'VTV': 0.05,
@@ -510,9 +540,6 @@ while True:
                     fltCashDividend *= optimizedPortfolio.portfolioAssets.at[tsNextDay, f'{etf}_shares']
                     optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += fltCashDividend
 
-            # add $50 to account at end of month
-            optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
-
             # update the portfolio value
             optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
 
@@ -528,8 +555,8 @@ while True:
     else:
         break
 
-print("Portfolio initial value: ", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[0], 'Portfolio Value'])
-print("Portfolio end value: ", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[-1], 'Portfolio Value'])
+print("Portfolio initial value: $", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[0], 'Portfolio Value'])
+print("Portfolio end value: $", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[-1], 'Portfolio Value'])
 
 dfSPY = Processor.price_data(etfs='SPY', start_date=pd.Timestamp('2014-06-30'), end_date=tsLastTradingDay, OHLCVAC='Adj Close')
 dfPercentChange = dfSPY.pct_change()
@@ -541,9 +568,9 @@ dfPercentChange = dfOptimizedPortfolioValue.pct_change()
 dfOptimizedPortfolioReturns = ((1 + dfPercentChange).cumprod() - 1)
 dfOptimizedPortfolioReturns.plot.line()
 
-# optimizedPortfolio.portfolioAssets.plot.line(y=['Portfolio Value', 'Cash'])
-
 path = os.getcwd() + "/Data/Portfolio Data"
-optimizedPortfolio.portfolioAssets.to_csv(os.path.join(path, r'optimizedPortfolio.csv'))
+optimizedPortfolioDataframe = optimizedPortfolio.portfolioAssets
+optimizedPortfolioDataframe.to_csv(os.path.join(path, r'optimizedPortfolio.csv'), na_rep='nan',
+                                   date_format='%Y-%m-%d %H:%M:%S')
 
 print("")
