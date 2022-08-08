@@ -14,6 +14,7 @@ if __name__ == "__main__":
     from portfolio import Portfolio
     from processing import Processor
     from pandas.tseries.offsets import BMonthEnd, BDay
+    import matplotlib.pyplot as plt
 else:
     raise Exception("This file was not created to be imported")
 # --------------------------------------------------------------------------- #
@@ -548,15 +549,20 @@ print("Portfolio end value: $", optimizedPortfolio.portfolioAssets.at[optimizedP
 dfSPY = Processor.price_data(etfs='SPY', start_date=pd.Timestamp('2014-06-30'), end_date=tsLastTradingDay, OHLCVAC='Adj Close')
 dfPercentChange = dfSPY.pct_change()
 dfSPYTotalReturns = ((1 + dfPercentChange).cumprod() - 1)
-dfSPYTotalReturns.plot.line()
 
 dfOptimizedPortfolioValue = optimizedPortfolio.portfolioAssets['Portfolio Value']
 dfPercentChange = dfOptimizedPortfolioValue.pct_change()
 dfOptimizedPortfolioReturns = ((1 + dfPercentChange).cumprod() - 1)
-dfOptimizedPortfolioReturns.plot.line()
+
+plt.plot(dfOptimizedPortfolioReturns, '#18453B')
+plt.plot(dfSPYTotalReturns, 'b')
+plt.title("Performance of Optimized Portfolio vs. S&P 500 ($SPY)")
+plt.ylabel('Cumulative Return')
+plt.xlabel('Date')
+plt.legend(['Optimized Portfolio', 'S&P 500'], loc='upper left')
+plt.show()
 
 path = os.getcwd() + "/Data/Portfolio Data"
 optimizedPortfolioDataframe = optimizedPortfolio.portfolioAssets
 optimizedPortfolioDataframe.to_csv(os.path.join(path, r'optimizedPortfolio.csv'), na_rep='nan',
                                    date_format='%Y-%m-%d %H:%M:%S')
-input("press any key to end")
