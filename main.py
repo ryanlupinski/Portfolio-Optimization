@@ -462,9 +462,9 @@ while True:
         # check to see if tsIndexPointer is end of month
         tsBMonthEndCheck = tsIndexPointer + BMonthEnd(0)
         if tsIndexPointer == tsBMonthEndCheck:
-            # add $100 to account at end of month
-            optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
-            optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
+            # # add $100 to account at end of month
+            # optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
+            # optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
             dictBuyAndHoldPercentages = {
                 'MTUM':  0.05,
                 'VTV': 0.05,
