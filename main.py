@@ -462,9 +462,9 @@ while True:
         # check to see if tsIndexPointer is end of month
         tsBMonthEndCheck = tsIndexPointer + BMonthEnd(0)
         if tsIndexPointer == tsBMonthEndCheck:
-            # # add $100 to account at end of month
-            # optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
-            # optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
+            # add $100 to account at end of month
+            optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 100.00
+            optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
             dictBuyAndHoldPercentages = {
                 'MTUM':  0.05,
                 'VTV': 0.05,
@@ -546,16 +546,16 @@ while True:
 print("Portfolio initial value: $", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[0], 'Portfolio Value'])
 print("Portfolio end value: $", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[-1], 'Portfolio Value'])
 
-dfSPY = Processor.price_data(etfs='SPY', start_date=pd.Timestamp('2014-06-30'), end_date=tsLastTradingDay, OHLCVAC='Close')
-dfPercentChange = dfSPY.pct_change()
-dfSPYTotalReturns = ((1 + dfPercentChange).cumprod() - 1)
+# dfSPY = Processor.price_data(etfs='SPY', start_date=pd.Timestamp('2014-06-30'), end_date=tsLastTradingDay, OHLCVAC='Close')
+# dfPercentChange = dfSPY.pct_change()
+# dfSPYTotalReturns = ((1 + dfPercentChange).cumprod() - 1)
 
 dfOptimizedPortfolioValue = optimizedPortfolio.portfolioAssets['Portfolio Value']
 dfPercentChange = dfOptimizedPortfolioValue.pct_change()
 dfOptimizedPortfolioReturns = ((1 + dfPercentChange).cumprod() - 1)
 
 plt.plot(dfOptimizedPortfolioReturns, '#18453B')
-plt.plot(dfSPYTotalReturns, 'b')
+# plt.plot(dfSPYTotalReturns, 'b')
 plt.title("Performance of Optimized Portfolio vs. S&P 500 ($SPY)")
 plt.ylabel('Cumulative Return')
 plt.xlabel('Date')
