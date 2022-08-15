@@ -1,4 +1,3 @@
-import os # remove this
 import pandas as pd
 from pandas.tseries.offsets import BDay
 
@@ -20,9 +19,9 @@ class Portfolio:
             # startDate -= BDay(1)  # roll back start date 1 day to initialize dataframe
             d = {'Date': [startDate],
                  'Cash': [(float(portfolioValue))]}
-            for i in etfs:
-                d.update({f'{i}_shares': int(0)})
-                d.update({f'{i}_close': float(0.00)})
+            for etf in etfs:
+                d.update({f'{etf}_shares': int(0)})
+                d.update({f'{etf}_close': float(0.00)})
             d.update({'Portfolio Value': float(portfolioValue)})
             self.__portfolioAssets = pd.DataFrame(data=d).set_index('Date')
             print(f"Portfolio instantiated with ${portfolioValue:.2f}\n")
@@ -40,10 +39,6 @@ class Portfolio:
     def buy_shares_at_open(self, date, etf, shares, cost):
         if cost > self.__portfolioAssets.at[date, 'Cash']:
             print('Insufficient funds')
-            # EVENTUALLY REMOVE THIS WHEN SELL ORDERS ARE HANDLED FIRST -------------#
-            self.__portfolioAssets.at[date, f'{etf}_shares'] += shares
-            self.__portfolioAssets.at[date, 'Cash'] -= cost
-            # EVENTUALLY REMOVE THIS WHEN SELL ORDERS ARE HANDLED FIRST -------------#
         else:
             self.__portfolioAssets.at[date, f'{etf}_shares'] += shares
             self.__portfolioAssets.at[date, 'Cash'] -= cost
@@ -61,17 +56,25 @@ class Portfolio:
     def portfolio_closing_value(self, date, etfs):
         cash = self.__portfolioAssets.at[date, 'Cash']
         self.__portfolioAssets.at[date, 'Portfolio Value'] = cash
-        for i in etfs:
-            shares = self.__portfolioAssets.at[date, f'{i}_shares']
-            price = self.__portfolioAssets.at[date, f'{i}_close']
+        for etf in etfs:
+            shares = self.__portfolioAssets.at[date, f'{etf}_shares']
+            price = self.__portfolioAssets.at[date, f'{etf}_close']
             etfValue = (shares * price)
             self.__portfolioAssets.at[date, 'Portfolio Value'] += etfValue
 
     def get_portfolio_closing_value(self, date):
         return self.__portfolioAssets.at[date, 'Portfolio Value']
 
-    def add_row_to_dataframe(self, df):
-        self.__portfolioAssets = self.__portfolioAssets.append(df, verify_integrity=True)
+    def add_next_row_to_dataframe(self, tsPointer, tsAdd, etfs):
+        dictNextDay = {'Date': [tsAdd],
+                       'Cash': [self.__portfolioAssets.at[tsPointer, 'Cash']]}
+        for etf in etfs:
+            dictNextDay.update({f'{etf}_shares': self.__portfolioAssets.at[tsPointer, f'{etf}_shares']})
+            dictNextDay.update({f'{etf}_close': self.__portfolioAssets.at[tsPointer, f'{etf}_close']})
+        dictNextDay.update({'Portfolio Value': self.__portfolioAssets.at[tsPointer, 'Portfolio Value']})
+        # create df from dict and add 'date' string for index
+        dfNextDay = pd.DataFrame(data=dictNextDay).set_index('Date')
+        self.__portfolioAssets = self.__portfolioAssets.append(dfNextDay, verify_integrity=True)
 
     def get_last_index(self):
         return self.__portfolioAssets.index[-1]

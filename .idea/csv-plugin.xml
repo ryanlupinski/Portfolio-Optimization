@@ -10,10 +10,66 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/Dataframes/Price Data/df200DSMATenYears.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Dataframes/Price Data/dfAdjClosingPriceDataTenYears.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Dataframes/Price Data/dfClosingPriceDataTenYears.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/Dataframes/Price Data/dfOpeningPriceDataTenYears.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Portfolio Data/Dividends/dfBNDX_dividends.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Portfolio Data/Dividends/dfDBC_dividends.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Portfolio Data/Dividends/dfMTUM_dividends.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Portfolio Data/Dividends/dfVCIT_dividends.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Portfolio Data/Dividends/dfVGLT_dividends.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
             </Attribute>
           </value>
         </entry>

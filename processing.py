@@ -10,7 +10,7 @@ tsToday = pd.Timestamp.today()
 lstETFs = [
     'MTUM',  # US Stocks Momentum
     'VTV',  # US Stocks Value
-    'VEU',  # Foreign Developed Stock
+    'VEU',  # Foreign Developed Stocks
     'VWO',  # Foreign Emerging Stocks
     'VCIT',  # Corporate Bonds
     'VGLT',  # 30Y Bonds
