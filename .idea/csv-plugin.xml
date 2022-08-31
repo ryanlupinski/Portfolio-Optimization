@@ -10,6 +10,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/Dataframes/ETF Returns and Ranks/dfDBC.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Dataframes/ETF Returns and Ranks/dfVTIP.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/Dataframes/Price Data/df200DSMATenYears.csv">
           <value>
             <Attribute>
@@ -74,6 +88,13 @@
           </value>
         </entry>
         <entry key="/Data/Portfolio Data/optimizedPortfolio.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Spreadsheet CSVs/Portfolio Last Trading Day Closing Price Data.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

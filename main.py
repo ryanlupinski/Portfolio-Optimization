@@ -403,7 +403,7 @@ except:
     # Instantiate optimizedPortfolio with $10,000 on tsIndexPointer date
     optimizedPortfolioDataframe = None
     optimizedPortfolio = Portfolio(etfs=lstETFs,
-                                   portfolioValue=1000.00,
+                                   portfolioValue=10000.00,
                                    startDate=tsIndexPointer,
                                    data=optimizedPortfolioDataframe)
     # save optimizedPortfolio to /Data/Portfolio Data
@@ -444,6 +444,10 @@ while True:
     if tsLastTradingDay > optimizedPortfolio.get_last_index():
         # set tsIndexPointer to optimizedPortfolio.portfolioAssets.index[-1]
         tsIndexPointer = optimizedPortfolio.get_last_index()
+        """This iNext section is an index variable used to iterate over the indexes of dfClosingPriceDataTenYears
+        which has known dates when the market is open. There are some difficulties using Pandas Bday combined 
+        with the US Federal Holiday package.
+        """
         try:
             iNext -= 1
         except:
@@ -460,12 +464,9 @@ while True:
         # # check to see if tsIndexPointer is end of month
         tsBMonthEndCheck = tsIndexPointer + BMonthEnd(0)
         if tsIndexPointer == tsBMonthEndCheck:
-            # add $100 to account at end of month
-            optimizedPortfolio.portfolioAssets.at[tsNextDay, 'Cash'] += 50.00
-            optimizedPortfolio.portfolio_closing_value(date=tsNextDay, etfs=lstETFs)
 
             dictBuyAndHoldPercentages = {
-                'MTUM':  0.0,
+                'MTUM': 0.0,
                 'VTV': 0.0,
                 'VEU': 0.0,
                 'VWO': 0.0,
@@ -536,7 +537,7 @@ while True:
             for etf in lstETFs:
                 # calculate cash dividend on tsNextDay, if any
                 try:
-                    fltDividend = dictOfETFDividends[f'df{etf}_div'].at[tsIndexPointer, 'Dividend']
+                    fltDividend = dictOfETFDividends[f'df{etf}_div'].at[tsNextDay, 'Dividend']
                 except:
                     fltDividend = 0.0
                 fltCashDividend = optimizedPortfolio.portfolioAssets.at[tsNextDay, f'{etf}_shares'] * fltDividend
@@ -558,7 +559,7 @@ while True:
             for etf in lstETFs:
                 # calculate cash dividend on tsNextDay, if any
                 try:
-                    fltDividend = dictOfETFDividends[f'df{etf}_div'].at[tsIndexPointer, 'Dividend']
+                    fltDividend = dictOfETFDividends[f'df{etf}_div'].at[tsNextDay, 'Dividend']
                 except:
                     fltDividend = 0.0
                 fltCashDividend = optimizedPortfolio.portfolioAssets.at[tsNextDay, f'{etf}_shares'] * fltDividend
@@ -574,20 +575,14 @@ while True:
 print("Portfolio initial value: $", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[0], 'Portfolio Value'])
 print("Portfolio end value: $", optimizedPortfolio.portfolioAssets.at[optimizedPortfolio.portfolioAssets.index[-1], 'Portfolio Value'])
 
-dfSPY = Processor.price_data(etfs='SPY', start_date=pd.Timestamp('2014-06-30'), end_date=tsLastTradingDay, OHLCVAC='Adj Close')
-dfPercentChange = dfSPY.pct_change()
-dfSPYTotalReturns = ((1 + dfPercentChange).cumprod() - 1)
-
+# Plot Portfolio Value
 dfOptimizedPortfolioValue = optimizedPortfolio.portfolioAssets['Portfolio Value']
-dfPercentChange = dfOptimizedPortfolioValue.pct_change()
-dfOptimizedPortfolioReturns = ((1 + dfPercentChange).cumprod() - 1)
 
-plt.plot(dfOptimizedPortfolioReturns, '#18453B')
-plt.plot(dfSPYTotalReturns, 'b')
-plt.title("Performance of Optimized Portfolio vs. S&P 500 ($SPY)")
-plt.ylabel('Cumulative Return')
+plt.plot(dfOptimizedPortfolioValue, '#18453B')
+plt.title("Performance of Optimized Portfolio")
+plt.ylabel('Portfolio Value $')
 plt.xlabel('Date')
-plt.legend(['Optimized Portfolio', 'S&P 500'], loc='upper left')
+plt.legend(['Optimized Portfolio'], loc='upper left')
 plt.show()
 
 path = os.getcwd() + "/Data/Portfolio Data"
