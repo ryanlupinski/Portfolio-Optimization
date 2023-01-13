@@ -46,7 +46,8 @@ print(f"Today: {tsToday}")
 print(f"Last trading day: {tsLastTradingDay}")
 # --------------------------------------------------------------------------- #
 
-# Load or create dataframes of price data ----------------------------------- #
+# Load or create dataframes of price data ---
+# -------------------------------- #
 # --------------------------------------------------------------------------- #
 """OPENING PRICE DATA"""
 # Check to see if opening price data csv exists in /Data/Dataframes/Price Data
