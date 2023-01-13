@@ -2,6 +2,7 @@ if __name__ == "__main__":
     raise Exception("This file is not meant to ran by itself")
 else:
     import pandas_datareader.data as web
+    import yfinance as yf
     import pandas as pd
     from pandas.tseries.offsets import BMonthEnd
 
@@ -50,7 +51,8 @@ class Processor:
         :param start_date: first day of time frame to return price data
         :return: dataframe of price data
         """
-        dfPriceData = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
+        # dfPriceData = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
+        dfPriceData = yf.download(etfs, start=start_date, end=end_date)[OHLCVAC]
         return dfPriceData
 
     @staticmethod
@@ -65,7 +67,8 @@ class Processor:
         :param etfs: ETF symbols to get price from
         :return: dataframe of 200 day moving averages for each ETF
         """
-        df = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
+        # df = web.DataReader(etfs, 'yahoo', start=start_date, end=end_date)[OHLCVAC]
+        df = yf.download(etfs, start=start_date, end=end_date)[OHLCVAC]
         dfMovingAverage = df.rolling(window=window).mean()
         return dfMovingAverage
 

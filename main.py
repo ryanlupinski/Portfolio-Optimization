@@ -60,12 +60,15 @@ try:
 except:
     print('Creating 10 year opening price dataframe')
     # Create dataframe of 10 years of opening price data
+    tsLastTradingDay += bday_us  # yfinance has end date issue
     dfOpeningPriceDataTenYears = Processor.price_data(etfs=lstETFs, start_date=tsTenYears,
                                                       end_date=tsLastTradingDay, OHLCVAC='Open')
     # Save dataframe of 10 years of opening price date to /Data/Dataframes/Price Data
     path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfOpeningPriceDataTenYears.to_csv(os.path.join(path, r'dfOpeningPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
+    tsLastTradingDay = pd.Timestamp(
+        Processor.last_trading_day().date())  # Reset tsLastTradingDay
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
@@ -80,12 +83,15 @@ try:
 except:
     print('Creating 10 year closing price dataframe')
     # Create dataframe of 10 years of closing price data
+    tsLastTradingDay += bday_us  # yfinance has end date issue
     dfClosingPriceDataTenYears = Processor.price_data(etfs=lstETFs, start_date=tsTenYears,
                                                       end_date=tsLastTradingDay, OHLCVAC='Close')
     # Save dataframe of 10 years of closing price date to /Data/Dataframes/Price Data
     path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfClosingPriceDataTenYears.csv'), na_rep='nan',
                                       date_format='%Y-%m-%d %H:%M:%S')
+    tsLastTradingDay = pd.Timestamp(
+        Processor.last_trading_day().date())  # Reset tsLastTradingDay
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
@@ -100,12 +106,15 @@ try:
 except:
     print('Creating 10 year adjusted closing price dataframe')
     # Create dataframe of 10 years of adjusted closing price data
+    tsLastTradingDay += bday_us  # yfinance has end date issue
     dfAdjClosingPriceDataTenYears = Processor.price_data(etfs=lstETFs, start_date=tsTenYears,
                                                          end_date=tsLastTradingDay, OHLCVAC='Adj Close')
     # Save dataframe of 10 years of adjusted closing price date to /Data/Dataframes/Price Data
     path = os.getcwd() + "/Data/Dataframes/Price Data"
     dfAdjClosingPriceDataTenYears.to_csv(os.path.join(path, r'dfAdjClosingPriceDataTenYears.csv'), na_rep='nan',
                                          date_format='%Y-%m-%d %H:%M:%S')
+    tsLastTradingDay = pd.Timestamp(
+        Processor.last_trading_day().date())  # Reset tsLastTradingDay
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
@@ -120,12 +129,15 @@ try:
 except:
     print('Creating 10 year 200D SMA dataframe')
     # Create dataframe of 10 years of 200D SMA data
+    tsLastTradingDay += bday_us  # yfinance has end date issue
     df200DSMATenYears = Processor.moving_average(etfs=lstETFs, start_date=tsTenYears, end_date=tsLastTradingDay,
                                                  OHLCVAC='Close', window=200)
     # Save dataframe of 10 years of 200D SMA data to /Data/Dataframes/Price Data
     path = os.getcwd() + "/Data/Dataframes/Price Data"
     df200DSMATenYears.to_csv(os.path.join(path, r'df200DSMATenYears.csv'), na_rep='nan',
                              date_format='%Y-%m-%d %H:%M:%S')
+    tsLastTradingDay = pd.Timestamp(
+        Processor.last_trading_day().date())  # Reset tsLastTradingDay
 # --------------------------------------------------------------------------- #
 
 # Load or create dict of returns and ranks dataframes ----------------------- #
