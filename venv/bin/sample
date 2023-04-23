@@ -1,6 +1,4 @@
-#!/bin/sh
-'''exec' "/Users/ryanlupinski/PycharmProjects/Finance/Portfolio Optimization/venv/bin/python" "$0" "$@"
-' '''
+#!/Users/ryanlupinski/Documents/GitHub/Portfolio-Optimization/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
