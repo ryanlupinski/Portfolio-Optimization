@@ -10,6 +10,34 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/Data/Dataframes/Price Data/df200DSMATenYears.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Dataframes/Price Data/dfAdjClosingPriceDataTenYears.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Dataframes/Price Data/dfClosingPriceDataTenYears.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/Data/Dataframes/Price Data/dfOpeningPriceDataTenYears.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/Data/Portfolio Data/optimizedPortfolio.csv">
           <value>
             <Attribute>
